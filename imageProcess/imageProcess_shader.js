@@ -42,8 +42,13 @@ const shaders = {
         } else if (u_type == 2) {
             // 黑白
             out_color = color.rrra;
+        } else if (u_type == 3) {
+            // 颜色偏移
+            vec2 offsetCoord = one_pixel * vec2(8.0, 8.0);
+            vec4 maskR = texture(u_texture, v_texCoord - offsetCoord);
+            vec4 maskG = texture(u_texture, v_texCoord);
+            out_color = vec4(maskR.r, maskG.g, color.b, color.a);
         } else {
-
             out_color = vec4((color - L_color).rgb, 1.0);
         }
 

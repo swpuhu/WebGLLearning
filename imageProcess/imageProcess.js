@@ -11,7 +11,7 @@ document.body.appendChild(canvas);
 const gl = canvas.getContext('webgl2');
 const program = util.initWebGL(gl, shaders.vertexShader, shaders.fragmentShader);
 gl.useProgram(program);
-let points = util.createClipPath(canvas, 0.2, 0.2, 0.1, 0.5);
+let points = util.createClipPath(canvas);
 
 let fsize = Float32Array.BYTES_PER_ELEMENT;
 
@@ -57,7 +57,7 @@ gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 gl.bindTexture(gl.TEXTURE_2D, null);
 
 let image = new Image();
-image.src = '../assets/gaoda1.jpg';
+image.src = '../assets/test2.png';
 
 image.onload = function () {
     const originTexture = util.createTexture(gl);
@@ -67,7 +67,7 @@ image.onload = function () {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
     uniforms.u_flipY = 0;
-    uniforms.u_type = 2;
+    uniforms.u_type = 3;
     gl.uniform1i(u_type, uniforms.u_type);
     gl.uniform1f(u_flipY, uniforms.u_flipY);
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[0]);
@@ -86,7 +86,7 @@ image.onload = function () {
     // gl.uniform1i(u_type, uniforms.u_type);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[1]);
-    uniforms.u_type = 1;
+    uniforms.u_type = 0;
     gl.uniform1i(u_type, uniforms.u_type);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
     gl.bindTexture(gl.TEXTURE_2D, textures[1]);
