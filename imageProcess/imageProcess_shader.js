@@ -20,6 +20,7 @@ const shaders = {
     uniform mat4 u_translate;
     void main () {
         gl_Position = u_projection * u_translate * u_scale * u_rotate * a_position;
+        // gl_Position = u_projection * a_position;
         if (u_flipY == 1) {
             gl_Position = gl_Position * vec4(1.0, -1.0, 1.0, 1.0);
         }

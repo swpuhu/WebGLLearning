@@ -1,4 +1,3 @@
-
 /**
  * 
  * @param {WebGL2RenderingContext} gl 
@@ -142,7 +141,7 @@ function createHueRotateMatrix(value) {
 function createSaturateMatrix(value) {
     return new Float32Array([
         0.3086 * (1 - value) + value, 0.3086 * (1 - value), 0.3086 * (1 - value), 0.0,
-        0.6094*(1 - value), 0.6094*(1 - value) + value, 0.6094*(1 - value), 0.0,
+        0.6094 * (1 - value), 0.6094 * (1 - value) + value, 0.6094 * (1 - value), 0.0,
         0.0820 * (1 - value), 0.0820 * (1 - value), 0.0820 * (1 - value) + value, 0.0,
         0.0, 0.0, 0.0, 1.0
     ]);
@@ -185,20 +184,21 @@ function createArcVertex(gl, x, y, radius, startArc, endArc, isInverse = false) 
  * @param {WebGLRenderingContext} gl
  */
 function createTexture(gl) {
-   let texture = gl.createTexture();
-   gl.bindTexture(gl.TEXTURE_2D, texture);
-   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-   return texture;
+    let texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    // gl.generateMipmap(gl.TEXTURE_2D);
+    return texture;
 }
 
 function computeKernalWeight(kernal) {
     let weight = kernal.reduce((prev, cur) => {
         return prev + cur;
     }, 0);
-    return weight <= 0 ? 1: weight;
+    return weight <= 0 ? 1 : weight;
 }
 
 /**
@@ -221,8 +221,8 @@ function checkPointIn(x, y, vertX, vertY) {
         for (let i = 0, j = vertX.length - 1; i < vertX.length; j = i++) {
             if ((vertY[i] > y) !== (vertY[j] > y) &&
                 (x < (y - vertY[i]) * (vertX[j] - vertX[i]) / (vertY[j] - vertY[i]) + vertX[i])) {
-                    r = !r;
-                }
+                r = !r;
+            }
         }
         return r;
     }
@@ -235,7 +235,7 @@ function checkPointIn(x, y, vertX, vertY) {
  * @param {Array} vertX
  * @param {Array} vertY
  */
-function checkPointIn2 (x, y, vertX, vertY) {
+function checkPointIn2(x, y, vertX, vertY) {
     let minX = Math.min(...vertX);
     let minY = Math.min(...vertY);
     let maxX = Math.max(...vertX);
@@ -248,8 +248,8 @@ function checkPointIn2 (x, y, vertX, vertY) {
         for (let i = 0, j = vertX.length - 1; i < vertX.length; j = i++) {
             if ((vertY[i] > y) !== (vertY[j] > y) &&
                 (x < (y - vertY[i]) * (vertX[j] - vertX[i]) / (vertY[j] - vertY[i]) + vertX[i])) {
-                    r = !r;
-                }
+                r = !r;
+            }
         }
         return r;
     }
@@ -318,6 +318,50 @@ function createClipPath(canvas, left = 0, right = 0, _bottom = 0, _top = 0, offs
     ])
 }
 
+function rotate(center, x, y, rotate) {
+    let cos = Math.cos(rotate * Math.PI / 180);
+    let sin = Math.sin(rotate * Math.PI / 180);
+    return [
+        x * cos - y * sin + (1 - cos) * center.x + sin * center.y,
+        x * sin + y * cos + (1 - cos) * center.y - sin * center.x,
+    ]
+}
+
+function pnpoly(number, verX, verY, testX, testY) {
+    let i, j, c = false;
+    for(i = 0, j = number - 1; i < number; j = i++) {
+        if(((verY[i] > testY) !== (verY[j] > testY)) &&
+            (testX < (verX[j] - verX[i]) * (testY - verY[i]) / (verY[j] - verY[i]) + verX[i])) {
+            c = !c;
+        }
+    }
+    return c;
+}
+
+function calcDistance(x1, y1, x2, y2) {
+    return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+}
+
+function createTriangleClipPath(canvas, progress, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
+    let centerX = canvas.width / 2 + offsetX * canvas.width;
+    let centerY = canvas.height / 2 + offsetY * canvas.height;
+    let distanceLD = calcDistance(centerX, centerY, 0, 0);
+    let distanceLU = calcDistance(centerX, centerY, 0, canvas.height);
+    let distanceRD = calcDistance(centerX, centerY, canvas.width, 0);
+    let distanceRU = calcDistance(centerX, centerY, canvas.width, canvas.height);
+    let r = Math.max(distanceLD, distanceLU, distanceRD, distanceRU) * progress;
+    let points = new Float32Array([
+         canvas.width / 2, canvas.height / 2 + 2 * r, 0.5, 0.5 + 2 * r / canvas.height,
+         canvas.width / 2 - 1.732 * r, canvas.height / 2 - r, 0.5 - 1.732 * r / canvas.width, 0.5 - r / canvas.height,
+         canvas.width / 2 + 1.732 * r, canvas.height / 2- r, 0.5 + 1.732 * r / canvas.width, 0.5 - r / canvas.height
+    ]);
+    for (let i = 0; i < points.length; i += 4) {
+        // points[i + 2] 
+        points[i + 1] = canvas.height - points[i + 1];
+        points[i + 3] = 1 - points[i + 3];
+    }
+    return points;
+}
 export default {
     initWebGL,
     createProjection,
@@ -329,5 +373,8 @@ export default {
     createSaturateMatrix,
     createArcVertex,
     createTexture,
-    createClipPath
+    createClipPath,
+    createTriangleClipPath,
+    rotate,
+    pnpoly,
 }

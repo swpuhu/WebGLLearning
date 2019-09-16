@@ -7,6 +7,7 @@ canvas.height = 540;
 document.body.appendChild(canvas);
 
 const gl = canvas.getContext('webgl2');
+gl.clearColor(0.0, 0.0, 0.0, 1.0);
 const program = util.initWebGL(gl, shaders.vertexShader, shaders.fragmentShader);
 gl.useProgram(program);
 
@@ -17,7 +18,7 @@ const u_rotate = gl.getUniformLocation(program, 'u_rotate');
 const u_projection = gl.getUniformLocation(program, 'u_projection');
 const uniforms = {
     u_canvas_size: new Float32Array([canvas.width, canvas.height]),
-    u_rotate: util.createRotateMatrix({ x: canvas.width / 2, y: canvas.height / 2 }, 30),
+    u_rotate: util.createRotateMatrix({ x: canvas.width / 2, y: canvas.height / 2 }, 20),
     u_projection: util.createProjection(canvas.width, canvas.height, 1)
 }
 
@@ -58,10 +59,10 @@ gl.uniformMatrix4fv(u_rotate, false, uniforms.u_rotate);
 gl.uniformMatrix4fv(u_projection, false, uniforms.u_projection);
 
 let image = new Image();
-image.src = '../../assets/gaoda2.jpg';
+image.src = '../assets/gaoda2.jpg';
 
 let image2 = new Image();
-image.src = '../../assets/gaoda1.jpg';
+image.src = '../assets/gaoda1.jpg';
 
 
 let texture1 = util.createTexture(gl);
@@ -70,8 +71,20 @@ let framebuffer1 = gl.createFramebuffer();
 gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer1);
 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture1, 0);
 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+let textures = [];
+let frameBuffers = [];
+for (let i = 0; i < 2; ++i) {
+    let texture1 = util.createTexture(gl);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    let framebuffer1 = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer1);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture1, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    textures.push(texture1);
+    frameBuffers.push(framebuffer1);
+}
 
-loadImages(['../../assets/gaoda1.jpg', '../../assets/gaoda2.jpg'])
+loadImages(['../assets/gaoda1.jpg', '../assets/gaoda2.jpg'])
     .then(([img1, img2]) => {
         let originTexture = util.createTexture(gl);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img1);
@@ -80,10 +93,23 @@ loadImages(['../../assets/gaoda1.jpg', '../../assets/gaoda2.jpg'])
         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img2);
 
         // gl.bindTexture(gl.TEXTURE_2D, originTexture2);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer1);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        gl.bindTexture(gl.TEXTURE_2D, texture1);
+        
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer1);
+        // gl.drawArrays(gl.TRIANGLES, 0, 6);
+        // // gl.clear(gl.COLOR_BUFFER_BIT);
+        // gl.bindTexture(gl.TEXTURE_2D, texture1);
 
+        // gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        // gl.drawArrays(gl.TRIANGLES, 0, 6);
+        let count = 0;
+        for (let i = 0; i < 1; i++) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+            uniforms.u_rotate = util.createRotateMatrix({ x: canvas.width / 2, y: canvas.height / 2 }, 10);
+            gl.uniformMatrix4fv(u_rotate, false, uniforms.u_rotate);
+            count++;
+        }
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
