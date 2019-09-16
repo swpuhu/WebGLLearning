@@ -18,7 +18,7 @@ const gl = canvas.getContext('webgl2', {
 const program = util.initWebGL(gl, shaders.vertexShader, shaders.fragmentShader);
 gl.useProgram(program);
 let points = util.createClipPath(canvas);
-// let points = util.createTriangleClipPath(canvas, 0.5)
+
 // for (let i = 0; i < points.length; i += 4) {
 //     [points[i], points[i + 1]] = util.rotate({x: canvas.width / 2, y: canvas.height / 2}, points[i], points[i + 1], 30);
 // }
@@ -93,17 +93,19 @@ const effectList = [
     // enum_effectType.negative,
     enum_effectType.colorOffset,
     // enum_effectType.monochroma,
+    // enum_effectType.trianglePath,
     // enum_effectType.transform2d,
-
+    // enum_effectType.transform2d,
     // enum_effectType.gaussian,
+    // enum_effectType.negative,
 ];
 let currentIndex = 0;
 let count = 0;
 image.onload = function () {
     const originTexture = util.createTexture(gl);
     uniforms.u_resolution = new Float32Array([image.width, image.height]);
-    // gl.uniform2fv(u_resolution, uniforms.u_resolution);
-    // gl.bindTexture(gl.TEXTURE_2D, originTexture);
+    gl.uniform2fv(u_resolution, uniforms.u_resolution);
+    gl.bindTexture(gl.TEXTURE_2D, originTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
     uniforms.u_flipY = 0;
@@ -113,14 +115,14 @@ image.onload = function () {
     for (let i = 0; i < effectList.length; i++) {
         let effectType = effectList[i];
         gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-        // gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.clearBufferfv(gl.COLOR, 0, [0.0, 0.0, 0.0, 0.0])
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        // gl.clearBufferfv(gl.COLOR, 0, [0.0, 0.0, 0.0, 0.0])
         drawWithFilter(effectType);
         gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-        if (i === 0) {
-            points = util.createClipPath(canvas);
-            gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
-        }
+        // if (i === 0) {
+        //     points = util.createClipPath(canvas);
+        //     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+        // }
         currentIndex = (count + 1) % 2;
         ++count;
     }
@@ -181,6 +183,15 @@ function drawWithFilter(effectType) {
             uniforms.u_rotate = util.createRotateMatrix({x: canvas.width / 2, y: canvas.height / 2}, 0);
             gl.uniformMatrix4fv(u_rotate, false, uniforms.u_rotate);
             gl.uniform1i(u_type, uniforms.u_type);
+            break;
+        case enum_effectType.trianglePath:
+            points = util.createTriangleClipPath(canvas, 0.5);
+            gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+            uniforms.u_type = enum_effectType.trianglePath;
+            gl.uniform1i(u_type, uniforms.u_type);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+            points = util.createClipPath(canvas);
+            gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
             break;
         default:
             uniforms.u_type = enum_effectType.normal;

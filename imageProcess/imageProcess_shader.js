@@ -55,9 +55,9 @@ const shaders = {
             out_color = average(color);
         } else if (u_type == 3) {
             // 颜色偏移
-            vec2 offsetCoord = one_pixel * vec2(8.0, 8.0);
+            vec2 offsetCoord = one_pixel * vec2(3.0, 4.0);
             vec4 maskR = texture(u_texture, v_texCoord - offsetCoord);
-            vec4 maskG = texture(u_texture, v_texCoord);
+            vec4 maskG = texture(u_texture, v_texCoord + offsetCoord);
             out_color = vec4(maskR.r, maskG.g, color.b, color.a);
         } else if (u_type == 5) {
             // 高斯模糊
@@ -71,6 +71,9 @@ const shaders = {
             vec4 U_color = texture(u_texture, U_texCoord);
             vec4 D_color = texture(u_texture, D_texCoord);
             out_color = vec4((0.5 * color + 0.125 * L_color + 0.125 * R_color + 0.125 * U_color + 0.125 * D_color).rgb, color.a);
+        } else if (u_type == 6) {
+            // 三角形划像
+            out_color = color;
         } else {
             out_color = color;
         }

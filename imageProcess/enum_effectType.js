@@ -4,5 +4,6 @@ export default {
     "monochroma": 2,
     "colorOffset": 3,
     "transform2d": 4,
-    "gaussian": 5
+    "gaussian": 5,
+    "trianglePath": 6,
 }
