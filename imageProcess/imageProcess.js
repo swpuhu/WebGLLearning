@@ -57,7 +57,7 @@ gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 gl.bindTexture(gl.TEXTURE_2D, null);
 
 let image = new Image();
-image.src = '../../assets/gaoda1.jpg';
+image.src = '../assets/gaoda1.jpg';
 
 image.onload = function () {
     const originTexture = util.createTexture(gl);
