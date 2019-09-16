@@ -307,7 +307,7 @@ function generateImageByDiv(width, height, html) {
  * @param {number} _bottom 
  * @param {number} _top 
  */
-function createClipPath(canvas, left = 0, right = 0, _bottom = 0, _top = 0) {
+function createClipPath(canvas, left = 0, right = 0, _bottom = 0, _top = 0, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
     return new Float32Array([
         0 + canvas.width * left, 0 + canvas.height * _top, left, _top,
         canvas.width - canvas.width * right, 0 + canvas.height * _top, 1 - right, _top,
@@ -321,6 +321,7 @@ function createClipPath(canvas, left = 0, right = 0, _bottom = 0, _top = 0) {
 export default {
     initWebGL,
     createProjection,
+    createTranslateMatrix,
     createRotateMatrix,
     createScaleMatrix,
     createContrastMatrix,
