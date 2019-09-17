@@ -18,7 +18,10 @@ const u_rotate = gl.getUniformLocation(program, 'u_rotate');
 const u_projection = gl.getUniformLocation(program, 'u_projection');
 const uniforms = {
     u_canvas_size: new Float32Array([canvas.width, canvas.height]),
-    u_rotate: util.createRotateMatrix({ x: canvas.width / 2, y: canvas.height / 2 }, 20),
+    u_rotate: util.createRotateMatrix({
+        x: canvas.width / 2,
+        y: canvas.height / 2
+    }, 10),
     u_projection: util.createProjection(canvas.width, canvas.height, 1)
 }
 
@@ -72,38 +75,56 @@ gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer1);
 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture1, 0);
 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 let textures = [];
-let frameBuffers = [];
+let colorFramebuffers = [];
+let renderFramebuffers = [];
 for (let i = 0; i < 2; ++i) {
+    
+
+    let colorRenderbuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, colorRenderbuffer);
+    gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 4, gl.RGBA8, canvas.width, canvas.height);
+    let renderFramebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, colorRenderbuffer);
+
     let texture1 = util.createTexture(gl);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    let framebuffer1 = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer1);
+    let colorFramebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, colorFramebuffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture1, 0);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
     textures.push(texture1);
-    frameBuffers.push(framebuffer1);
+    colorFramebuffers.push(colorFramebuffer);
+    renderFramebuffers.push(renderFramebuffer);
 }
+
+
+
 
 loadImages(['../assets/gaoda1.jpg', '../assets/gaoda2.jpg'])
     .then(([img1, img2]) => {
         let originTexture = util.createTexture(gl);
-        let renderableFramebuffer = gl.createFramebuffer();
-        let colorFramebuffer = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, colorFramebuffer);
-        let texture = util.createTexture(gl);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.bindTexture(gl.TEXTURE_2D, originTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img1);
-
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, renderableFramebuffer);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, colorFramebuffers[0]);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffers[0]);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, renderableFramebuffer);
-        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, colorFramebuffer);
-        gl.blitFramebuffer(0, 0, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height, gl.COLOR_BUFFER_BIT, gl.NEAREST);
-        gl.bindTexture(gl.TEXTURE_2D, texture);
+
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, renderFramebuffers[0]);
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, colorFramebuffers[0]);
+        gl.blitFramebuffer(
+            0, 0, canvas.width, canvas.height,
+            0, 0, canvas.width, canvas.height,
+            gl.COLOR_BUFFER_BIT, gl.NEAREST
+        )
+        gl.bindTexture(gl.TEXTURE_2D, textures[0]);
+
+        uniforms.u_rotate = util.createRotateMatrix({
+            x: canvas.width / 2,
+            y: canvas.height / 2
+        }, 0);
+        gl.uniformMatrix4fv(u_rotate, false, uniforms.u_rotate)
+
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -124,4 +145,3 @@ function loadImages(srcs) {
     }
     return Promise.all(promises)
 }
-
