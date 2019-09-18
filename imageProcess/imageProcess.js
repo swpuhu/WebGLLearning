@@ -96,8 +96,8 @@ const effectList = [
     enum_effectType.trianglePath,
     enum_effectType.transform2d,
     enum_effectType.transform2d,
-    enum_effectType.gaussian,
-    enum_effectType.negative,
+    // enum_effectType.gaussian,
+    // enum_effectType.negative,
 ];
 let currentIndex = 0;
 let count = 0;
