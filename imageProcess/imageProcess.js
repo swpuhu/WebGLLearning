@@ -93,11 +93,11 @@ const effectList = [
     // enum_effectType.negative,
     enum_effectType.colorOffset,
     // enum_effectType.monochroma,
-    // enum_effectType.trianglePath,
-    // enum_effectType.transform2d,
-    // enum_effectType.transform2d,
-    // enum_effectType.gaussian,
-    // enum_effectType.negative,
+    enum_effectType.trianglePath,
+    enum_effectType.transform2d,
+    enum_effectType.transform2d,
+    enum_effectType.gaussian,
+    enum_effectType.negative,
 ];
 let currentIndex = 0;
 let count = 0;
@@ -114,15 +114,44 @@ image.onload = function () {
 
     for (let i = 0; i < effectList.length; i++) {
         let effectType = effectList[i];
-        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        // gl.clearBufferfv(gl.COLOR, 0, [0.0, 0.0, 0.0, 0.0])
-        drawWithFilter(effectType);
-        gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-        // if (i === 0) {
-        //     points = util.createClipPath(canvas);
-        //     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
-        // }
+        if (effectType === enum_effectType.gaussian) {
+            drawWithFilter(effectType);
+        } else if (1) {
+            let msRenderbuffer = gl.createRenderbuffer();
+            gl.bindRenderbuffer(gl.RENDERBUFFER, msRenderbuffer);
+            gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 8, gl.RGBA8, canvas.width, canvas.height);
+            let renderFramebuffer = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msRenderbuffer);
+
+            gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
+            // gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+            // gl.clear(gl.COLOR_BUFFER_BIT);
+            drawWithFilter(effectType);
+            gl.bindFramebuffer(gl.READ_FRAMEBUFFER, renderFramebuffer);
+            gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, frameBuffers[count % 2]);
+            // gl.clearBufferfv(gl.COLOR, 0, [0.0, 0.0, 0.0, 0.0])
+            gl.blitFramebuffer(
+                0, 0, canvas.width, canvas.height,
+                0, 0, canvas.width, canvas.height,
+                gl.COLOR_BUFFER_BIT, gl.NEAREST
+            )
+
+            // drawWithFilter(effectType);
+            gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+            // if (i === 0) {
+            //     points = util.createClipPath(canvas);
+            //     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+            // }
+            gl.deleteFramebuffer(renderFramebuffer);
+            gl.deleteRenderbuffer(msRenderbuffer);
+
+        } else {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            drawWithFilter(effectType);
+            gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+        }
         currentIndex = (count + 1) % 2;
         ++count;
     }
@@ -162,8 +191,26 @@ function drawWithFilter(effectType) {
             for (let i = 0; i < 10; i++) {
                 uniforms.u_gaussian_radius = gaussianRadius++;
                 gl.uniform1f(u_gaussian_radius, uniforms.u_gaussian_radius);
-                gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+
+                let msRenderbuffer = gl.createRenderbuffer();
+                gl.bindRenderbuffer(gl.RENDERBUFFER, msRenderbuffer);
+                gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 8, gl.RGBA8, canvas.width, canvas.height);
+                let renderFramebuffer = gl.createFramebuffer();
+                gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
+                gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, msRenderbuffer);
+
+                gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
                 gl.drawArrays(gl.TRIANGLES, 0, 6);
+                gl.bindFramebuffer(gl.READ_FRAMEBUFFER, renderFramebuffer);
+                gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, frameBuffers[count % 2]);
+                gl.blitFramebuffer(
+                    0, 0, canvas.width, canvas.height,
+                    0, 0, canvas.width, canvas.height,
+                    gl.COLOR_BUFFER_BIT, gl.NEAREST
+                );
+                // gl.drawArrays(gl.TRIANGLES, 0, 6);
+                gl.deleteFramebuffer(renderFramebuffer);
+                gl.deleteRenderbuffer(msRenderbuffer);
                 gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
                 ++count;
             }
@@ -180,7 +227,7 @@ function drawWithFilter(effectType) {
             gl.uniformMatrix4fv(u_rotate, false, uniforms.u_rotate);
             gl.drawArrays(gl.TRIANGLES, 0, 6);
             uniforms.u_type = enum_effectType.normal;
-            uniforms.u_rotate = util.createRotateMatrix({x: canvas.width / 2, y: canvas.height / 2}, 0);
+            uniforms.u_rotate = util.createRotateMatrix({ x: canvas.width / 2, y: canvas.height / 2 }, 0);
             gl.uniformMatrix4fv(u_rotate, false, uniforms.u_rotate);
             gl.uniform1i(u_type, uniforms.u_type);
             break;
