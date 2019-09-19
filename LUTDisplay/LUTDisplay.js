@@ -1,7 +1,16 @@
+const width = 512;
+const height = 512;
 const canvas = document.createElement('canvas');
-canvas.width = 512;
-canvas.height = 512;
+canvas.width = width;
+canvas.height = height;
 document.body.appendChild(canvas);
+
+
+const canvas2 = document.createElement('canvas');
+canvas2.width = width;
+canvas2.height = height;
+document.body.appendChild(canvas2);
+const ctx2 = canvas2.getContext('2d');
 
 const inputFile = document.createElement('input');
 inputFile.type = 'file';
@@ -40,6 +49,23 @@ inputFile.onchange = function () {
             }
         }
         context.putImageData(data, 0, 0);
+
+        let img = new Image();
+        img.src = '../assets/gaoda1.jpg';
+        img.onload = function () {
+            ctx2.drawImage(img, 0, 0);
+            let imgData = ctx2.getImageData(0, 0, width, height);
+            for (let i = 0; i < imgData.data.length; i += 4) {
+                let r = imgData.data[i] >> 2;
+                let g = imgData.data[i + 1] >> 2;
+                let b = imgData.data[i + 2] >> 2;
+                let index = (r + g * 64 + b * 64 * 64) * 3;
+                imgData.data[i] = processor.result[index] * 255;
+                imgData.data[i + 1] = processor.result[index + 1] * 255;
+                imgData.data[i + 2] = processor.result[index + 2] * 255;
+            }
+            ctx2.putImageData(imgData, 0, 0);
+        }
     }
     fileReader.readAsArrayBuffer(file);
 }
