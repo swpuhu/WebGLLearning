@@ -25,18 +25,20 @@ inputFile.onchange = function () {
         }
 
         console.log(processor.result.length);
-        // let rowCount = 
-        for (let i = 0; i < data.width * 4; i += 256) {
-            for (let j = 0; j < data.height; j += 64) {
-                for (let k = 0; k < 64; k++) {
-                    data.data[i * ]
+        let rowCount = data.width * 4;
+        let k = 0;
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                for (let m = 0; m < 64; m++) {
+                    for (let n = 0; n < 64; n++, k += 3) {
+                        data.data[(i * 64 + m) * rowCount + (j * 64 + n) * 4] = processor.result[k] * 255;
+                        data.data[(i * 64 + m) * rowCount + (j * 64 + n) * 4 + 1] = processor.result[k + 1] * 255;
+                        data.data[(i * 64 + m) * rowCount + (j * 64 + n) * 4 + 2] = processor.result[k + 2] * 255;
+                        data.data[(i * 64 + m) * rowCount + (j * 64 + n) * 4 + 3] = 255;
+                    }
                 }
             }
         }
-        // data.data.fill(204);
-        // context.fillStyle = '#ccc';
-        // context.fillRect(0, 0, canvas.width, canvas.height);
-        // let imgData = context.getImageData(0, 0, canvas.width, canvas.height);
         context.putImageData(data, 0, 0);
     }
     fileReader.readAsArrayBuffer(file);
