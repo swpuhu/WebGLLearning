@@ -7,7 +7,7 @@ import WuhuaFilter from './wuhua.js';
 import DoubleFilter from './2DFilter.js';
 import CircleFilter from './circleBorder.js';
 import MaskFilter from './maskFilter.js';
-
+import BinaryFilter from './binaryFilter.js';
 
 const width = 640;
 const height = 360;
@@ -66,6 +66,8 @@ const wuhuaFilter = new WuhuaFilter(gl, projectionMat);
 const doubleFilter = new DoubleFilter(gl, projectionMat);
 const circleFilter = new CircleFilter(gl, projectionMat);
 const maskFilter = new MaskFilter(gl, projectionMat);
+const binaryFilter = new BinaryFilter(gl, projectionMat);
+
 
 function test() {
     let img = new Image();
@@ -74,10 +76,10 @@ function test() {
     img.src = '../assets/4ktest.jpeg';
     
         
-    loadImages(['../assets/template.png', '../assets/4ktest.jpeg'])
+    loadImages(['../assets/template.png', '../assets/gaoda2.jpg'])
     .then(([mask, img]) => {    
 
-        gl.useProgram(maskFilter.program);
+        gl.useProgram(binaryFilter.program);
         let originTexture = util.createTexture(gl);
         let maskTexture = util.createTexture(gl);
 
