@@ -1,5 +1,29 @@
 import util from '../util.js';
-import {colorOffset as shader} from './shaders.js'
+
+const shader = {
+    vertexShader: `#version 300 es
+    in vec4 a_position;
+    in vec2 a_texCoord;
+    out vec2 v_texCoord;
+    uniform mat4 u_projection;
+    void main () {
+        gl_Position = u_projection * a_position;
+        v_texCoord = a_texCoord;
+    }
+    `,
+    fragmentShader:  `#version 300 es
+    precision mediump float;
+    out vec4 out_color;
+    in vec2 v_texCoord;
+    uniform sampler2D u_texture;
+    uniform vec2 u_resolution;
+    void main () {
+        vec2 one_pixel = 1.0 / u_resolution;
+        vec4 color = texture(u_texture, v_texCoord);
+        out_color = vec4(1.0 - color.rgb, color.a);
+    }
+    `
+}
 
 /**
  * 
@@ -13,8 +37,7 @@ export default function (gl, projectionMat) {
     gl.useProgram(program);
 
     const u_projection = gl.getUniformLocation(program, 'u_projection');
-    const u_resolution = gl.getUniformLocation(program, 'u_resolution');
-    const u_offset = gl.getUniformLocation(program, 'u_offset');
+    gl.uniformMatrix4fv(u_projection, false, projectionMat);
 
     const a_position = gl.getAttribLocation(program, 'a_position');
     gl.enableVertexAttribArray(a_position);
@@ -23,29 +46,8 @@ export default function (gl, projectionMat) {
     gl.enableVertexAttribArray(a_texCoord);
     gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, f32size * 4, f32size * 2);
 
-    gl.uniformMatrix4fv(u_projection, false, projectionMat);
-    gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
-    let offset = new Float32Array([5, 5]);
-    gl.uniform1fv(u_offset, offset);
-
-    function setResolution (width, height) {
-        gl.uniform2f(u_resolution, width, height);
-    }
-
-    function setProjection (mat) {
-        gl.uniformMatrix4fv(u_projection, false, mat);
-    }
-
-    function setOffset(offsetX, offsetY) {
-        let offset = new Float32Array([offsetX, offsetY]);
-        gl.uniform1fv(u_offset, offset);
-    }
-
 
     return {
-        setResolution,
-        setProjection,
-        setOffset,
         program
     }
 }
