@@ -44,7 +44,39 @@ function loadImages(srcs) {
     return Promise.all(promises)
 }
 
-loadImages(['../assets/gaoda1.jpg'])
-.then(([img]) => {
-    filter.render(img);
+// loadImages(['../assets/gaoda1.jpg'])
+// .then(([img]) => {
+//     filter.setEffectList([select.value]);
+//     filter.render(img);
+// })
+
+let video = document.createElement('video');
+video.src = '../assets/ad1.mp4';
+video.oncanplaythrough = function () {
+    filter.setEffectList([select.value]);
+    filter.render(video);
+}
+
+
+let playId;
+function play() {
+    video.paused && video.play();
+    filter.render();
+    playId = requestAnimationFrame(play);
+}
+
+
+function pause() {
+    cancelAnimationFrame(playId);
+    video.pause();
+}
+
+window.addEventListener('keydown', function (e) {
+    if (e.code === 'Space') {
+        if (video.paused) {
+            play();
+        } else {
+            pause();
+        }
+    }
 })
