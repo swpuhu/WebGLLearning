@@ -1,4 +1,5 @@
 import util from '../util.js';
+import Enum_Effect from './Enum/effectType.js';
 import ColorOffsetFilter from './colorOffset.js';
 import NegativeFilter from './negativeFilter.js';
 import SketchFilter from './sketchFilter.js';
@@ -16,151 +17,189 @@ import SwirlFilter from './swirlFilter.js';
 import BallFilter from './ballFilter.js';
 import GaussianFilter from './gaussianFilter.js';
 import BlendFilter from './blendFilter.js';
+import Normal from './normal.js';
 
-const width = 640;
-const height = 360;
-const canvas = document.createElement('canvas');
-canvas.width = width;
-canvas.height = height;
-document.body.appendChild(canvas);
-const gl = canvas.getContext('webgl2');
+/**
+ * 
+ * @param {HTMLCanvasElement} canvas 
+ */
+export default function (canvas) {
+    const gl = canvas.getContext('webgl2');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.enable(gl.BLEND);
+    // gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 
 
-gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-// gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-gl.enable(gl.BLEND);
-gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
+    const points = new Float32Array([
+        0, 0, 0, 0,
+        width, 0, 0, 0,
+        width, height, 0, 0,
+        width, height, 0, 0,
+        0, height, 0, 0,
+        0, 0, 0, 0
+    ]);
 
-
-const points = new Float32Array([
-    0, 0, 0, 0,
-    width, 0, 0, 0,
-    width, height, 0, 0,
-    width, height, 0, 0,
-    0, height, 0, 0,
-    0, 0, 0, 0
-]);
-
-for (let i = 0; i < points.length; i += 4) {
-    points[i + 2] = points[i] / width;
-    points[i + 3] = points[i + 1] / height;
-}
-
-const buffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
-
-const textures = [];
-const frameBuffers = [];
-for (let i = 0; i < 2; i++) {
-    let framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    let texture = util.createTexture(gl);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-    textures.push(texture);
-    frameBuffers.push(framebuffer);
-}
-
-const addFramebuffer = gl.createFramebuffer();
-gl.bindFramebuffer(gl.FRAMEBUFFER, addFramebuffer);
-const addTexture = util.createTexture(gl);
-gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, addTexture, 0);
-
-gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-gl.bindTexture(gl.TEXTURE_2D, null);
-
-const projectionMat = util.createProjection(width, height, 1);
-const colorOffsetFilter = new ColorOffsetFilter(gl, projectionMat);
-const negativeFilter = new NegativeFilter(gl, projectionMat);
-const sketchFilter = new SketchFilter(gl, projectionMat);
-const beautifyFilter = new BeautifyFilter(gl, projectionMat);
-const wuhuaFilter = new WuhuaFilter(gl, projectionMat);
-const doubleFilter = new DoubleFilter(gl, projectionMat);
-const circleFilter = new CircleFilter(gl, projectionMat);
-const binaryFilter = new BinaryFilter(gl, projectionMat);
-const atomizationFilter = new AtomizeFilter(gl, projectionMat);
-const mosicFilter = new Mosiac(gl, projectionMat);
-const radiusLightFilter = new RadiusLightFilter(gl, projectionMat);
-const preserveColorFilter = new PreserveColorFilter(gl, projectionMat);
-const swirlFilter = new SwirlFilter(gl, projectionMat);
-const ballFilter = new BallFilter(gl, projectionMat);
-const gaussianFilter = new GaussianFilter(gl, projectionMat);
-const blendFilter = new BlendFilter(gl, projectionMat);
-
-async function test() {
-
-    const [mask, img] = await loadImages(['../assets/template.png', '../assets/gaoda3.jpg']);
-    const maskFilter = new MaskFilter(gl, projectionMat, mask);
-
-    gl.useProgram(gaussianFilter.program);
-    let originTexture = util.createTexture(gl);
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, originTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-    let count = 0;
-    let radius = 1;
-    for (let i = 0; i < 10; i++) {
-        let renderFramebuffer = gl.createFramebuffer();
-        gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
-        let renderbuffer = gl.createRenderbuffer();
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-        gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 8, gl.RGBA8, canvas.width, canvas.height);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, renderbuffer);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
-        gaussianFilter.setRadius(radius++);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, renderFramebuffer);
-        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, frameBuffers[count % 2]);
-        gl.clearBufferfv(gl.COLOR, 0, [0.0, 0.0, 0.0, 0.0]); 
-        gl.blitFramebuffer(
-            0, 0, canvas.width, canvas.height,
-            0, 0, canvas.width, canvas.height,
-            gl.COLOR_BUFFER_BIT, gl.LINEAR
-        );
-
-        gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-        gl.deleteFramebuffer(renderFramebuffer);
-        gl.deleteRenderbuffer(renderbuffer);
-        count++;
-
+    for (let i = 0; i < points.length; i += 4) {
+        points[i + 2] = points[i] / width;
+        points[i + 3] = points[i + 1] / height;
     }
 
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+    const textures = [];
+    const frameBuffers = [];
+    for (let i = 0; i < 2; i++) {
+        let framebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+        let texture = util.createTexture(gl);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+        textures.push(texture);
+        frameBuffers.push(framebuffer);
+    }
+
+    const addFramebuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, addFramebuffer);
-    gl.useProgram(doubleFilter.program);
-    doubleFilter.setRotate(0, {x: 0, y: 0});
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    const addTexture = util.createTexture(gl);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, addTexture, 0);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.useProgram(blendFilter.program);
-    gl.activeTexture(gl.TEXTURE3);
-    gl.bindTexture(gl.TEXTURE_2D, addTexture);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, originTexture);
+    gl.bindTexture(gl.TEXTURE_2D, null);
 
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    const projectionMat = util.createProjection(width, height, 1);
+    const colorOffsetFilter = new ColorOffsetFilter(gl, projectionMat);
+    const negativeFilter = new NegativeFilter(gl, projectionMat);
+    const sketchFilter = new SketchFilter(gl, projectionMat);
+    const beautifyFilter = new BeautifyFilter(gl, projectionMat);
+    const wuhuaFilter = new WuhuaFilter(gl, projectionMat);
+    const doubleFilter = new DoubleFilter(gl, projectionMat);
+    const circleFilter = new CircleFilter(gl, projectionMat);
+    const binaryFilter = new BinaryFilter(gl, projectionMat);
+    const atomizationFilter = new AtomizeFilter(gl, projectionMat);
+    const mosicFilter = new Mosiac(gl, projectionMat);
+    const radiusLightFilter = new RadiusLightFilter(gl, projectionMat);
+    const preserveColorFilter = new PreserveColorFilter(gl, projectionMat);
+    const swirlFilter = new SwirlFilter(gl, projectionMat);
+    const ballFilter = new BallFilter(gl, projectionMat);
+    const gaussianFilter = new GaussianFilter(gl, projectionMat);
+    const blendFilter = new BlendFilter(gl, projectionMat);
+    const normal = new Normal(gl, projectionMat);
 
 
-}
-
-test();
 
 
-
-function loadImages(srcs) {
-    let promises = [];
-    for (let src of srcs) {
-        let image = new Image();
-        let p = new Promise((resolve, reject) => {
-            image.onload = function () {
-                resolve(image);
-            }
-            image.src = src;
-        });
-        promises.push(p);
+    const effects = {
+        [Enum_Effect.COLOR_OFFSET]: colorOffsetFilter,
+        [Enum_Effect.NEGATIVE]: negativeFilter,
+        [Enum_Effect.DOUBLE]: doubleFilter,
+        [Enum_Effect.BINARY]: binaryFilter,
+        [Enum_Effect.ATOMIZATION]: atomizationFilter,
+        [Enum_Effect.MOSIC]: mosicFilter,
+        [Enum_Effect.RADIUS_LIGHT]: radiusLightFilter,
+        [Enum_Effect.SWIRL]: swirlFilter,
+        [Enum_Effect.GAUSSIAN]: gaussianFilter
     }
-    return Promise.all(promises)
+
+    let effectList = [
+        // Enum_Effect.DOUBLE,
+        // Enum_Effect.COLOR_OFFSET,
+        // Enum_Effect.GAUSSIAN,
+        // Enum_Effect.MOSIC,
+        // Enum_Effect.SWIRL,
+        // Enum_Effect.DOUBLE
+    ]
+
+
+
+
+    function drawWithEffect(effectType, count) {
+
+        gl.useProgram(effects[effectType].program);
+        if (effectType === Enum_Effect.DOUBLE) {
+            let renderFramebuffer = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
+            let renderbuffer = gl.createRenderbuffer();
+            gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+            gl.renderbufferStorageMultisample(gl.RENDERBUFFER, 8, gl.RGBA8, canvas.width, canvas.height);
+            gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, renderbuffer);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            gl.bindFramebuffer(gl.READ_FRAMEBUFFER, renderFramebuffer);
+            gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, frameBuffers[count % 2]);
+            gl.clearBufferfv(gl.COLOR, 0, [0.0, 0.0, 0.0, 0.0]);
+            gl.blitFramebuffer(
+                0, 0, canvas.width, canvas.height,
+                0, 0, canvas.width, canvas.height,
+                gl.COLOR_BUFFER_BIT, gl.LINEAR
+            );
+
+            gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+            gl.deleteFramebuffer(renderFramebuffer);
+            gl.deleteRenderbuffer(renderbuffer);
+        } else {
+            switch (effectType) {
+                case Enum_Effect.GAUSSIAN:
+                    const radius = 10;
+                    for (let i = 0; i < radius; i++) {
+                        gaussianFilter.setRadius(i);
+                        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                        gl.clear(gl.COLOR_BUFFER_BIT);
+                        gl.drawArrays(gl.TRIANGLES, 0, 6);
+                        gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                        count++;
+                    }
+                    --count;
+                    break;
+                case Enum_Effect.SWIRL:
+                    swirlFilter.setRotate(50);
+                default:
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    break;
+            }
+
+        }
+        return ++count;
+    }
+
+    let cacheImg;
+    async function render(img) {
+        if (img !== cacheImg && img) {
+            cacheImg = img;
+        }
+
+        let originTexture = util.createTexture(gl);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, originTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cacheImg);
+        let count = 0;
+        let radius = 1;
+        for (let i = 0; i < effectList.length; i++) {
+            count = drawWithEffect(effectList[i], count);
+        }
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.useProgram(normal.program);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+
+    }
+
+
+    function setEffectList(value) {
+        effectList = value;
+    }
+
+    return {
+        render,
+        setEffectList
+    }
 }

@@ -24,13 +24,13 @@ const shader = {
         vec2 l = v_texCoord + u_radius * vec2(-1.0, 0.0) * one_pixel;
         vec2 r = v_texCoord + u_radius * vec2(1.0, 0.0) * one_pixel;
         vec2 u = v_texCoord + u_radius * vec2(0.0, 1.0) * one_pixel;
-        vec2 d = v_texCoord + u_radius * vec2(1.0, -1.0) * one_pixel;
+        vec2 d = v_texCoord + u_radius * vec2(0.0, -1.0) * one_pixel;
         vec4 color = texture(u_texture, v_texCoord);
         vec4 l_color = texture(u_texture, l);
         vec4 r_color = texture(u_texture, r);
         vec4 u_color = texture(u_texture, u);
         vec4 d_color = texture(u_texture, d);
-        out_color = vec4((0.125 * l_color + 0.125 * r_color + 0.125 * u_color + 0.125 * d_color + 0.5 * color).rgb, color.a);
+        out_color = vec4((0.125 * l_color + 0.125 * r_color + 0.125 * u_color + 0.125 * d_color + 0.5 * color).rgba);
     }
     `
 }
@@ -63,7 +63,7 @@ export default function (gl, projectionMat) {
     gl.uniform1i(u_texture, 0);
 
     const u_radius = gl.getUniformLocation(program, 'u_radius');
-    gl.uniform1f(u_radius, 20);
+    gl.uniform1f(u_radius, 1);
 
     function setRadius(radius) {
         gl.uniform1f(u_radius, radius);

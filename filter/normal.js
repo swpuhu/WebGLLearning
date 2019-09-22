@@ -17,31 +17,8 @@ const shader = {
     out vec4 out_color;
     in vec2 v_texCoord;
     uniform sampler2D u_texture;
-    uniform sampler2D u_mask_texture;
     void main () {
-        vec4 mask_color = texture(u_mask_texture, v_texCoord);
-        vec4 color = texture(u_texture, v_texCoord);
-        // float avg = (color.r + color.g + color.b) / 3.0;
-        out_color = vec4((color.rgb * mask_color.rgb) / 0.5, color.a);
-        if (color.r <= 0.5) {
-            out_color.r = (color.r * mask_color.r) / 0.5;
-        } else {
-            out_color.r = 1.0 - (1.0 - color.r) * (1.0 - mask_color.r) / 0.5;
-        }
-
-        if (color.g <= 0.5) {
-            out_color.g = (color.g * mask_color.g) / 0.5;
-        } else {
-            out_color.g = 1.0 - (1.0 - color.g) * (1.0 - mask_color.g) / 0.5;
-        }
-
-        if (color.b <= 0.5) {
-            out_color.b = (color.b * mask_color.b) / 0.5;
-        } else {
-            out_color.b = 1.0 - (1.0 - color.b) * (1.0 - mask_color.b) / 0.5;
-        }
-
-        out_color.a = color.a;
+        out_color = texture(u_texture, v_texCoord);
     }
     `
 }
@@ -66,19 +43,6 @@ export default function (gl, projectionMat) {
     const a_texCoord = gl.getAttribLocation(program, 'a_texCoord');
     gl.enableVertexAttribArray(a_texCoord);
     gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, f32size * 4, f32size * 2);
-
-    // const u_resolution = gl.getUniformLocation(program, 'u_resolution');
-    // gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
-
-    const u_texture = gl.getUniformLocation(program, 'u_texture');
-    gl.uniform1i(u_texture, 0);
-
-    const u_mask_texture = gl.getUniformLocation(program, 'u_mask_texture');
-    gl.uniform1i(u_mask_texture, 3);
-    // gl.activeTexture(gl.TEXTURE2);
-
-
-    // gl.activeTexture(gl.TEXTURE0);
     
 
     return {

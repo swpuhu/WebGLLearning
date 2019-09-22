@@ -61,10 +61,16 @@ export default function (gl, projectionMat) {
     const params = gl.getUniformLocation(program, 'params');
     gl.uniform1fv(params, [gl.canvas.width / 2, gl.canvas.height / 2, 0 / 3600]);
 
+
+    function setRotate(value) {
+        gl.uniform1fv(params, [gl.canvas.width / 2, gl.canvas.height / 2,  value / 3600]);
+    }
+
     
 
 
     return {
         program,
+        setRotate
     }
 }
