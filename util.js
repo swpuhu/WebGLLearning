@@ -362,6 +362,47 @@ function createTriangleClipPath(canvas, progress, offsetX = 0, offsetY = 0, scal
     }
     return points;
 }
+
+
+
+function createNoiseImage(width, height, type, factor) {
+    let data;
+    switch (type) {
+        case WebGLRenderingContext.RGBA:
+            data = new Uint8Array(width * height * 4);
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 2 * factor * Math.random();
+                data[i + 1] = factor * Math.random();
+                data[i + 2] = factor * Math.random();
+                data[i + 3] = factor * Math.random();
+            }
+            break;
+        case WebGLRenderingContext.RGB:
+            data = new Uint8Array(width * height * 3);
+            for (let i = 0; i < data.length; i += 3) {
+                data[i] = factor * Math.random();
+                data[i + 1] = factor * Math.random();
+                data[i + 2] = factor * Math.random();
+            }
+            break;
+        case WebGLRenderingContext.LUMINANCE_ALPHA:
+            data = new Uint8Array(width * height * 2);
+            for (let i = 0; i < data.length; i += 2) {
+                data[i] = factor * Math.random();
+                data[i + 1] = factor * Math.random();
+            }
+            break;
+        case WebGLRenderingContext.LUMINANCE:
+            data = new Uint8Array(width * height * 1);
+            for (let i = 0; i < data.length; i++) {
+                data[i] = factor * Math.random();
+            }
+            break;
+    }
+    return data;
+}
+
+
 export default {
     initWebGL,
     createProjection,
@@ -375,6 +416,7 @@ export default {
     createTexture,
     createClipPath,
     createTriangleClipPath,
+    createNoiseImage,
     rotate,
     pnpoly,
 }

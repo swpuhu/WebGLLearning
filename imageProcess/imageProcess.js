@@ -87,16 +87,16 @@ gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 gl.bindTexture(gl.TEXTURE_2D, null);
 
 let image = new Image();
-image.src = '../assets/test2.png';
+image.src = '../assets/gaoda1.jpg';
 
 const effectList = [
     // enum_effectType.negative,
     enum_effectType.colorOffset,
     // enum_effectType.monochroma,
-    enum_effectType.trianglePath,
-    enum_effectType.transform2d,
-    enum_effectType.transform2d,
-    // enum_effectType.gaussian,
+    // enum_effectType.trianglePath,
+    // enum_effectType.transform2d,
+    // enum_effectType.transform2d,
+    enum_effectType.gaussian,
     // enum_effectType.negative,
 ];
 let currentIndex = 0;

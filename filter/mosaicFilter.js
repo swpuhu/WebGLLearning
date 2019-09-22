@@ -5,33 +5,25 @@ const shader = {
     in vec4 a_position;
     in vec2 a_texCoord;
     out vec2 v_texCoord;
-    out vec4 v_position;
+
     uniform mat4 u_projection;
     void main () {
         gl_Position = u_projection * a_position;
         v_texCoord = a_texCoord;
-        v_position = a_position;
     }
     `,
     fragmentShader:  `#version 300 es
     precision mediump float;
     out vec4 out_color;
     in vec2 v_texCoord;
-    in vec4 v_position;
-
     uniform sampler2D u_texture;
     uniform vec2 u_resolution;
-    uniform float params[3];
+    uniform float u_step;
     void main () {
-        float centerX = params[0];
-        float centerY = params[1];
-        float radius = params[2];
-        float len = length(v_position.xy - vec2(centerX, centerY));
-        if (len < radius) {
-            out_color = texture(u_texture, v_texCoord);
-        } else {
-            out_color = vec4(0.0, 0.0, 0.0, 0.0);
-        }
+        int x = int(v_texCoord.x * u_resolution.x / u_step) * int(u_step);
+        int y = int(v_texCoord.y * u_resolution.y / u_step) * int(u_step);
+        vec4 color = texture(u_texture, vec2(float(x) / u_resolution.x, float(y) / u_resolution.y));
+        out_color = color;
     }
     `
 }
@@ -57,16 +49,19 @@ export default function (gl, projectionMat) {
     gl.enableVertexAttribArray(a_texCoord);
     gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, f32size * 4, f32size * 2);
 
-    
-    const params = gl.getUniformLocation(program, 'params');
-    gl.uniform1fv(params, new Float32Array([gl.canvas.width / 2, gl.canvas.height / 2, 200]));
+    const u_resolution = gl.getUniformLocation(program, 'u_resolution');
+    gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
 
-    function setCircle(centerX, centerY, radius) {
-        gl.uniform1fv(params, new Float32Array([centerX, centerY, radius]));
-    }
-    
+    const u_texture = gl.getUniformLocation(program, 'u_texture');
+    gl.uniform1i(u_texture, 0);
+
+
+    const u_step = gl.getUniformLocation(program, 'u_step');
+    const step = 8;
+    gl.uniform1f(u_step, step);
+
+
     return {
         program,
-        setCircle,
     }
 }
