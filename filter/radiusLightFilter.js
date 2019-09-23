@@ -26,7 +26,7 @@ const shader = {
         float len = length(gl_FragCoord.xy - vec2(centerX, centerY));
         vec4 light = vec4(0.0, 0.0, 0.0, 1.0);
         if (len <= radius) {
-            light = (1.0 - (len / radius)) * vec4(0.0, 1.0, 1.0, 1.0);
+            light = (1.0 - (len / radius)) * vec4(1.0, 1.0, 1.0, 1.0);
             // light = mix(light, vec4(1.0, 1.0, 1.0, 1.0), 1.0 - len / radius);
         }
         vec4 color = texture(u_texture, v_texCoord);
