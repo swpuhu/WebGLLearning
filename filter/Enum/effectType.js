@@ -7,5 +7,6 @@ export default {
     MOSIC: 'mosic',
     RADIUS_LIGHT: 'radiusLight',
     SWIRL: 'swirl',
-    GAUSSIAN: 'gaussian'
+    GAUSSIAN: 'gaussian',
+    GLOW: 'glow'
 }

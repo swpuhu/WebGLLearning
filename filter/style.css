@@ -1,0 +1,9 @@
+.effect-list {
+    height: 200px;
+    overflow: auto;
+    border: 1px solid #ccc;
+}
+
+.effect-list .item.active {
+    background-color: rgb(243, 173, 23)
+}

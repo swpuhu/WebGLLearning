@@ -52,6 +52,7 @@ export default function (canvas) {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
 
+    const originTexture = util.createTexture(gl);
     const textures = [];
     const frameBuffers = [];
     for (let i = 0; i < 2; i++) {
@@ -121,7 +122,7 @@ export default function (canvas) {
 
     function drawWithEffect(effectType, count) {
 
-        gl.useProgram(effects[effectType].program);
+        effects[effectType] && gl.useProgram(effects[effectType].program);
         if (effectType === Enum_Effect.DOUBLE) {
             let renderFramebuffer = gl.createFramebuffer();
             gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer);
@@ -157,6 +158,32 @@ export default function (canvas) {
                     }
                     --count;
                     break;
+                case Enum_Effect.GLOW:
+                    gl.useProgram(gaussianFilter.program);
+                    let glow_radius = 5;
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, addFramebuffer);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, addTexture);
+                    for (let i = 0; i < glow_radius; i++) {
+                        gaussianFilter.setRadius(i);
+                        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                        gl.clear(gl.COLOR_BUFFER_BIT);
+                        gl.drawArrays(gl.TRIANGLES, 0, 6);
+                        gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                        count++;
+                    }
+                    
+                    gl.useProgram(blendFilter.program);
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.activeTexture(gl.TEXTURE3);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[(count - 1) % 2]);
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, addTexture);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    // --count;
+
+                    break;
                 case Enum_Effect.SWIRL:
                     swirlFilter.setRotate(50);
                 default:
@@ -172,12 +199,12 @@ export default function (canvas) {
     }
 
     let cacheImg;
+    
     async function render(img) {
         if (img !== cacheImg && img) {
             cacheImg = img;
         }
 
-        let originTexture = util.createTexture(gl);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, originTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cacheImg);

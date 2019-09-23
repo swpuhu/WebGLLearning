@@ -9,8 +9,17 @@ canvas.height = height;
 document.body.appendChild(canvas);
 
 const filter = Filter(canvas);
+const effectList = [];
+filter.setEffectList(effectList);
 const UI = document.createElement('div');
 const select = document.createElement('select');
+const list = document.createElement('div');
+list.classList.add('effect-list');
+const addBtn = document.createElement('button');
+const delBtn = document.createElement('button');
+addBtn.textContent = '添加特效';
+delBtn .textContent = '删除特效';
+
 const keys = Object.keys(Enum_Effect);
 
 for (let i = 0; i < keys.length; i++) {
@@ -20,12 +29,43 @@ for (let i = 0; i < keys.length; i++) {
 }
 
 UI.appendChild(select);
+
+UI.appendChild(list);
+UI.appendChild(addBtn);
+UI.appendChild(delBtn);
 document.body.appendChild(UI);
 
-select.onchange = function () {
+addBtn.onclick = function () {
+    effectList.push(select.value);
+    let li = document.createElement('div');
+    li.classList.add('item');
+    li.textContent = select.value;
+    list.appendChild(li);
+    li.index = effectList.length - 1;
+    li.onclick = function () {
+        if (li.classList.contains['active']) {
+            li.classList.remove('active');
+        } else {
+            let sibling = li.parentElement.querySelectorAll('.item');
+            sibling.forEach(item => {
+                item.classList.remove('active');
+            })
+            li.classList.add('active');
+            
 
-    filter.setEffectList([select.value]);
-    filter.render();
+        }
+    }
+}
+
+delBtn.onclick = function () {
+    let selectedItem = list.querySelector('.active');
+    effectList.splice(selectedItem.index, 1);
+    selectedItem.remove();
+}
+
+select.onchange = function () {
+    // filter.setEffectList([select.value]);
+    // filter.render();
 }
 
 
@@ -53,7 +93,6 @@ function loadImages(srcs) {
 let video = document.createElement('video');
 video.src = '../assets/ad1.mp4';
 video.oncanplaythrough = function () {
-    filter.setEffectList([select.value]);
     filter.render(video);
 }
 
@@ -78,5 +117,5 @@ window.addEventListener('keydown', function (e) {
         } else {
             pause();
         }
-    }
+    }3
 })
