@@ -30,7 +30,7 @@ const shader = {
             // light = mix(light, vec4(1.0, 1.0, 1.0, 1.0), 1.0 - len / radius);
         }
         vec4 color = texture(u_texture, v_texCoord);
-        out_color = color + light;
+        out_color = vec4((color + light).rgb, color.a);
     }
     `
 }

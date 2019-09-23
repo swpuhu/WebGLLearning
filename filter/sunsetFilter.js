@@ -43,6 +43,7 @@ const shader = {
         textureColor = texture2D( inputImageTexture, vec2(xCoordinate, yCoordinate));
         grey1Color = texture2D(inputImageTexture4, vec2(xCoordinate, yCoordinate));
         grey2Color = texture2D(inputImageTexture3, vec2(xCoordinate, yCoordinate));
+        highp vec4 curveColor = texture2D(inputImageTexture2, vec2(xCoordinate, yCoordinate));
 
         // step1 normal blending with original
         redCurveValue = texture2D(inputImageTexture2, vec2(textureColor.r, 0.0)).r;
@@ -161,17 +162,17 @@ export default function (gl, projectionMat) {
 
     const curveData = new Uint8Array(256 * 2 * 4);
     for (let i = 0; i < 256; i++) {
-        curveData[0 + i * 4] = curveData1[i];
-        curveData[1 + i * 4] = curveData2[i];
-        curveData[2 + i * 4] = curveData3[i];
-        curveData[3 + i * 4] = curveData4[i];
+        curveData[0 + i * 4] = curveData5[i];
+        curveData[1 + i * 4] = curveData5[i];
+        curveData[2 + i * 4] = curveData5[i];
+        curveData[3 + i * 4] = 0xff;
     }
 
     for (let j = 0; j < 256; j++) {
-        curveData[1024 + j * 4] = curveData5[j];
-        curveData[1024 + (1 + j * 4)] = curveData5[j];
-        curveData[1024 + (2 + j * 4)] = curveData5[j];
-        curveData[1024 + (3 + j * 4)] = curveData5[j];
+        curveData[1024 + j * 4] = curveData1[j];
+        curveData[1024 + (1 + j * 4)] = curveData2[j];
+        curveData[1024 + (2 + j * 4)] = curveData3[j];
+        curveData[1024 + (3 + j * 4)] = curveData4[j];
     }
     
     const curveTexture = util.createTexture(gl);

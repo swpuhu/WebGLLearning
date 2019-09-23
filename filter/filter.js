@@ -27,6 +27,7 @@ import StencilFilter from './stencilFilter.js';
 import SunsetFilter from './sunsetFilter.js';
 import WarmFilter from './warmFilter.js';
 
+
 /**
  * 
  * @param {HTMLCanvasElement} canvas 
@@ -125,7 +126,8 @@ export default function (canvas) {
         [Enum_Effect.SKETCH]: sketchFilter,
         [Enum_Effect.STENCIL]: stencilFilter,
         [Enum_Effect.SUNSET]: sunsetFilter,
-        [Enum_Effect.WARM]: warmFilter
+        [Enum_Effect.WARM]: warmFilter,
+        [Enum_Effect.ANTIQUE]: antiqueFilter
     }
 
     let effectList = [
@@ -246,6 +248,13 @@ export default function (canvas) {
                     break;
                 case Enum_Effect.WARM:
                     warmFilter.bindMap();
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    break;
+                case Enum_Effect.ANTIQUE:
+                    antiqueFilter.bindMap();
                     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
                     gl.clear(gl.COLOR_BUFFER_BIT);
                     gl.drawArrays(gl.TRIANGLES, 0, 6);

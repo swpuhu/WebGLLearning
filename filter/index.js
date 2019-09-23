@@ -29,7 +29,6 @@ for (let i = 0; i < keys.length; i++) {
 }
 
 UI.appendChild(select);
-
 UI.appendChild(list);
 UI.appendChild(addBtn);
 UI.appendChild(delBtn);
