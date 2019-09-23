@@ -25,7 +25,7 @@ export default function (gl, projectionMat) {
 
     gl.uniformMatrix4fv(u_projection, false, projectionMat);
     gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
-    let offset = new Float32Array([5, 5]);
+    let offset = new Float32Array([3, 3]);
     gl.uniform1fv(u_offset, offset);
 
     function setResolution (width, height) {

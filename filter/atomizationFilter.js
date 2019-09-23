@@ -67,9 +67,16 @@ export default function (gl, projectionMat) {
     const data = util.createNoiseImage(gl.canvas.width, gl.canvas.height, gl.LUMINANCE_ALPHA, step * 2 + 1);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE_ALPHA, gl.canvas.width, gl.canvas.height, 0, gl.LUMINANCE_ALPHA, gl.UNSIGNED_BYTE, data);
     gl.activeTexture(gl.TEXTURE0);
+
+    function bindMap() {
+        gl.activeTexture(gl.TEXTURE2);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE_ALPHA, gl.canvas.width, gl.canvas.height, 0, gl.LUMINANCE_ALPHA, gl.UNSIGNED_BYTE, data);
+        gl.activeTexture(gl.TEXTURE0);
+    }
     
 
     return {
         program,
+        bindMap
     }
 }

@@ -21,9 +21,9 @@ const shader = {
         vec4 color = texture(u_texture, v_texCoord);
         float average = (color.r + color.b + color.g) / 3.0;
         if (average < 0.5) {
-            out_color = vec4(0.0, 0.0, 0.0, 1.0);
+            out_color = vec4(0.0, 0.0, 0.0, color.a);
         } else {
-            out_color = vec4(1.0, 1.0, 1.0, 1.0);
+            out_color = vec4(1.0, 1.0, 1.0, color.a);
         }
     }
     `

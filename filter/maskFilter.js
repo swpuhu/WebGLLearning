@@ -32,7 +32,7 @@ const shader = {
  * @param {WebGL2RenderingContext} gl 
  * @param {Float32Array} projectionMat
  */
-export default function (gl, projectionMat, maskImage) {
+export default function (gl, projectionMat) {
     
     let program = util.initWebGL(gl, shader.vertexShader, shader.fragmentShader);
     let f32size = Float32Array.BYTES_PER_ELEMENT;
@@ -55,12 +55,28 @@ export default function (gl, projectionMat, maskImage) {
     gl.uniform1i(u_mask_texture, 1);
     gl.activeTexture(gl.TEXTURE1);
 
+    const maskImg = new Image();
+    maskImg.src = '../assets/template.png';
     const maskTexture = util.createTexture(gl);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, maskImage);
-    gl.activeTexture(gl.TEXTURE0);
+    maskImg.onload = function () {
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, maskTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, maskImg);
+        gl.activeTexture(gl.TEXTURE0);
+    }
+
+    
+
+    function bindMap() {
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, maskTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, maskImg);
+        gl.activeTexture(gl.TEXTURE0);
+    }
     
 
     return {
         program,
+        bindMap
     }
 }

@@ -18,12 +18,12 @@ const shader = {
     in vec2 v_texCoord;
     uniform sampler2D u_texture;
     uniform vec2 u_resolution;
-    uniform float u_step;
+    uniform float u_width;
+    uniform float u_aspect;
     void main () {
-        int x = int(v_texCoord.x * u_resolution.x / u_step) * int(u_step);
-        int y = int(v_texCoord.y * u_resolution.y / u_step) * int(u_step);
-        vec4 color = texture(u_texture, vec2(float(x) / u_resolution.x, float(y) / u_resolution.y));
-        out_color = color;
+        vec2 sampleDivisor = vec2(u_width, u_width / u_aspect);
+        vec2 samplePos = v_texCoord - mod(v_texCoord, sampleDivisor) + 0.5 * sampleDivisor;
+        out_color = texture(u_texture, samplePos);
     }
     `
 }
@@ -55,10 +55,19 @@ export default function (gl, projectionMat) {
     const u_texture = gl.getUniformLocation(program, 'u_texture');
     gl.uniform1i(u_texture, 0);
 
+    const u_width = gl.getUniformLocation(program, 'u_width');
+    gl.uniform1f(u_width, 0.03);
 
-    const u_step = gl.getUniformLocation(program, 'u_step');
-    const step = 8;
-    gl.uniform1f(u_step, step);
+
+    const u_aspect = gl.getUniformLocation(program, 'u_aspect');
+    gl.uniform1f(u_aspect, 1);
+
+
+    function setFraction(width, aspect) {
+        gl.uniform1f(u_width, width);
+        gl.uniform1f(u_aspect, aspect);
+
+    }
 
 
     return {

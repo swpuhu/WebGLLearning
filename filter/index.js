@@ -50,17 +50,17 @@ addBtn.onclick = function () {
             sibling.forEach(item => {
                 item.classList.remove('active');
             })
-            li.classList.add('active');
-            
-
+            li.classList.add('active');        
         }
     }
+    video.paused && filter.render();
 }
 
 delBtn.onclick = function () {
     let selectedItem = list.querySelector('.active');
-    effectList.splice(selectedItem.index, 1);
-    selectedItem.remove();
+    selectedItem && effectList.splice(selectedItem.index, 1);
+    selectedItem && selectedItem.remove();
+    video.paused && filter.render();
 }
 
 select.onchange = function () {
@@ -91,7 +91,7 @@ function loadImages(srcs) {
 // })
 
 let video = document.createElement('video');
-video.src = '../assets/ad1.mp4';
+video.src = '../assets/popcart.mp4';
 video.oncanplaythrough = function () {
     filter.render(video);
 }

@@ -18,6 +18,14 @@ import BallFilter from './ballFilter.js';
 import GaussianFilter from './gaussianFilter.js';
 import BlendFilter from './blendFilter.js';
 import Normal from './normal.js';
+import AntiqueFilter from './antiqueFilter.js';
+import InkWellFilter from './inkWellFilter.js';
+import MonoFilter from './monoFilter.js';
+import iOSBlurFilter from './iOSblurFilter.js';
+import Gaussian2 from './gaussianFilter2.js';
+import StencilFilter from './stencilFilter.js';
+import SunsetFilter from './sunsetFilter.js';
+import WarmFilter from './warmFilter.js';
 
 /**
  * 
@@ -29,7 +37,6 @@ export default function (canvas) {
     const height = canvas.height;
 
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     // gl.enable(gl.BLEND);
     // gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 
@@ -79,22 +86,25 @@ export default function (canvas) {
     const negativeFilter = new NegativeFilter(gl, projectionMat);
     const sketchFilter = new SketchFilter(gl, projectionMat);
     const beautifyFilter = new BeautifyFilter(gl, projectionMat);
-    const wuhuaFilter = new WuhuaFilter(gl, projectionMat);
     const doubleFilter = new DoubleFilter(gl, projectionMat);
-    const circleFilter = new CircleFilter(gl, projectionMat);
     const binaryFilter = new BinaryFilter(gl, projectionMat);
     const atomizationFilter = new AtomizeFilter(gl, projectionMat);
     const mosicFilter = new Mosiac(gl, projectionMat);
     const radiusLightFilter = new RadiusLightFilter(gl, projectionMat);
     const preserveColorFilter = new PreserveColorFilter(gl, projectionMat);
     const swirlFilter = new SwirlFilter(gl, projectionMat);
-    const ballFilter = new BallFilter(gl, projectionMat);
     const gaussianFilter = new GaussianFilter(gl, projectionMat);
     const blendFilter = new BlendFilter(gl, projectionMat);
     const normal = new Normal(gl, projectionMat);
-
-
-
+    const antiqueFilter = new AntiqueFilter(gl, projectionMat);
+    const inkWellFilter = new InkWellFilter(gl, projectionMat);
+    const maskFilter = new MaskFilter(gl, projectionMat);
+    const monoFilter = new MonoFilter(gl, projectionMat);
+    const iosBlurFilter = new iOSBlurFilter(gl, projectionMat);
+    const gaussianFilter2 = new Gaussian2(gl, projectionMat);
+    const stencilFilter = new StencilFilter(gl, projectionMat);
+    const sunsetFilter = new SunsetFilter(gl, projectionMat);
+    const warmFilter = new WarmFilter(gl, projectionMat);
 
     const effects = {
         [Enum_Effect.COLOR_OFFSET]: colorOffsetFilter,
@@ -105,7 +115,17 @@ export default function (canvas) {
         [Enum_Effect.MOSIC]: mosicFilter,
         [Enum_Effect.RADIUS_LIGHT]: radiusLightFilter,
         [Enum_Effect.SWIRL]: swirlFilter,
-        [Enum_Effect.GAUSSIAN]: gaussianFilter
+        [Enum_Effect.GAUSSIAN]: gaussianFilter,
+        [Enum_Effect.ANTIQUE]: antiqueFilter,
+        [Enum_Effect.INKWELL]: inkWellFilter,
+        [Enum_Effect.MASK]: maskFilter,
+        [Enum_Effect.MONO]: monoFilter,
+        [Enum_Effect.IOSBLUR]: iosBlurFilter,
+        [Enum_Effect.GAUSSAIN2]: gaussianFilter2,
+        [Enum_Effect.SKETCH]: sketchFilter,
+        [Enum_Effect.STENCIL]: stencilFilter,
+        [Enum_Effect.SUNSET]: sunsetFilter,
+        [Enum_Effect.WARM]: warmFilter
     }
 
     let effectList = [
@@ -181,11 +201,56 @@ export default function (canvas) {
                     gl.bindTexture(gl.TEXTURE_2D, addTexture);
                     gl.drawArrays(gl.TRIANGLES, 0, 6);
                     gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    // --count;
-
+                    break;
+                case Enum_Effect.ATOMIZATION:
+                    atomizationFilter.bindMap();
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
                     break;
                 case Enum_Effect.SWIRL:
                     swirlFilter.setRotate(50);
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    break;
+                case Enum_Effect.MASK:
+                    maskFilter.bindMap();
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    break;
+                case Enum_Effect.INKWELL:
+                    inkWellFilter.bindMap();
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    break;
+                case Enum_Effect.STENCIL:
+                    stencilFilter.bindMap();
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    break;
+                case Enum_Effect.SUNSET:
+                    sunsetFilter.bindMap();
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    break;
+                case Enum_Effect.WARM:
+                    warmFilter.bindMap();
+                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    gl.drawArrays(gl.TRIANGLES, 0, 6);
+                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                    break;
                 default:
                     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
                     gl.clear(gl.COLOR_BUFFER_BIT);
