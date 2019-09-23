@@ -57,8 +57,11 @@ addBtn.onclick = function () {
 
 delBtn.onclick = function () {
     let selectedItem = list.querySelector('.active');
-    selectedItem && effectList.splice(selectedItem.index, 1);
-    selectedItem && selectedItem.remove();
+    if (selectedItem) {
+        let index = Array.prototype.indexOf.call(list.children, selectedItem);
+        effectList.splice(index, 1);
+        selectedItem.remove();
+    }
     video.paused && filter.render();
 }
 
