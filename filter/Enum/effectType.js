@@ -18,5 +18,6 @@ export default {
     SKETCH: 'sketch',
     STENCIL: 'stencil',
     SUNSET: 'sunset',
-    WARM: 'warm'
+    WARM: 'warm',
+    ANTIQUE: 'antique'
 }
