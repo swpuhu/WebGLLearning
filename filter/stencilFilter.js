@@ -60,23 +60,23 @@ export default function (gl, projectionMat) {
     gl.uniform1i(keepAlpha, 0);
 
     const inputImageTexture2 = gl.getUniformLocation(program, 'inputImageTexture2');
-    gl.uniform1i(inputImageTexture2, 1);
-    gl.activeTexture(gl.TEXTURE1);
+    gl.uniform1i(inputImageTexture2, 5);
+    gl.activeTexture(gl.TEXTURE5);
 
     let templateImg = new Image();
     templateImg.src = './template/shark.png';
     const templateTexture = util.createTexture(gl);
     templateImg.onload = function () {
-        gl.activeTexture(gl.TEXTURE1);
+        gl.activeTexture(gl.TEXTURE5);
         gl.bindTexture(gl.TEXTURE_2D, templateTexture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, templateImg);
         gl.activeTexture(gl.TEXTURE0);
     }
     
     function bindMap() {
-        gl.activeTexture(gl.TEXTURE1);
+        gl.activeTexture(gl.TEXTURE5);
         gl.bindTexture(gl.TEXTURE_2D, templateTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, templateImg);
+        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, templateImg);
         gl.activeTexture(gl.TEXTURE0);
     }
 

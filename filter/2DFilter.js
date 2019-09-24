@@ -74,10 +74,15 @@ export default function (gl, projectionMat) {
         translateMat = util.createTranslateMatrix(x, y);
         gl.uniformMatrix4fv(u_translate, false, translateMat);
     }
+
+    function setProjection(mat) {
+        gl.uniformMatrix4fv(u_projection, false, mat);
+    }
     return {
         program,
         setScale,
         setRotate,
-        setTranslate
+        setTranslate,
+        setProjection
     }
 }

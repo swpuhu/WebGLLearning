@@ -49,7 +49,6 @@ function initWebGL(gl, vertexSource, fragmentSource) {
 }
 
 function createProjection(width, height, depth) {
-    // 注意：这个矩阵翻转了 Y 轴，所以 0 在上方
     return [
         2 / width, 0, 0, 0,
         0, 2 / height, 0, 0,
