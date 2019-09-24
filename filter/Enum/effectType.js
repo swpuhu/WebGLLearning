@@ -1,7 +1,7 @@
 export default {
     COLOR_OFFSET: '颜色偏移',
     // NEGATIVE: '反色',
-    // DOUBLE: '2D',
+    DOUBLE: '2D',
     BINARY: '二值化',
     ATOMIZATION: '雾化',
     MOSIC: '马赛克',

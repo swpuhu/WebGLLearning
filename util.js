@@ -63,15 +63,39 @@ function createProjection(width, height, depth) {
  * @param {Object} center
  * @param {Number} rotate
  */
-function createRotateMatrix(center, rotate) {
+function createRotateMatrix(center, rotate, axis = 'z') {
     let cos = Math.cos(rotate * Math.PI / 180);
     let sin = Math.sin(rotate * Math.PI / 180);
-    return new Float32Array([
-        cos, sin, 0.0, 0.0,
-        -sin, cos, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        (1 - cos) * center.x + sin * center.y, (1 - cos) * center.y - sin * center.x, 0.0, 1.0,
-    ]);
+    if (!center.z) {
+        center.z = 0;
+    }
+    let ret;
+    switch(axis) {
+        case 'x':
+            ret = new Float32Array([
+                1.0, 0.0, 0.0, 0.0,
+                0.0, cos, sin, 0.0,
+                0.0, -sin, cos, 0.0,
+                0.0, (1 - cos) * center.y + sin * center.z, (1 - cos) * center.z - sin * center.y, 1.0
+            ]);
+            break;
+        case 'y':
+            ret = new Float32Array([
+                cos, 0.0, sin, 0.0,
+                0.0, 1.0, 0.0, 0.0,
+                -sin, 0.0, cos, 0.0,
+                (1 - cos) * center.x + sin * center.z, 0.0, (1 - cos) * center.z - sin * center.x, 1.0
+            ]);
+            break;
+        default:
+            ret = new Float32Array([
+                cos, sin, 0.0, 0.0,
+                -sin, cos, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0,
+                (1 - cos) * center.x + sin * center.y, (1 - cos) * center.y - sin * center.x, 0.0, 1.0,
+            ]);
+    }
+    return ret;
 }
 
 /**
