@@ -102,12 +102,12 @@ function createRotateMatrix(center, rotate, axis = 'z') {
  * @param {Number} tx
  * @param {Number} ty
  */
-function createTranslateMatrix(tx, ty) {
+function createTranslateMatrix(tx, ty, tz) {
     return new Float32Array([
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
-        tx, ty, 0.0, 1.0,
+        tx, ty, tz, 1.0,
     ]);
 }
 
@@ -427,19 +427,19 @@ function createNoiseImage(width, height, type, factor) {
 
 
 
-function createPerspective(fieldOfViewRadians, aspect, near, far) {    
-    let f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
-    let rangeInv = 1.0 / (near - far);
+function createPerspective(fieldOfViewRadians, aspect, near, far, l, r, t ,b) {    
+    let f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewRadians);
+    let rangeInv = 1.0 / (far - near);
 
     return [
       f / aspect, 0, 0, 0,
       0, f, 0, 0,
-      0, 0, (near + far) * rangeInv, -1,
-      0, 0, near * far * rangeInv * 2, 0
+      - (r + l) / (r - l), -(t + b) / (t - b), (near + far) * rangeInv, 1,
+      0, 0, -near * far * rangeInv * 2, 0
     ];
 }
 
-function createEditor (name, type, min, max, value, step = 1) {
+function createEditor (name, type = 'range', min, max, value, step = 1) {
     let obj = {};
     let oninput = null;
     let wrapper = document.createElement('div');

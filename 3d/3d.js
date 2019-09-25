@@ -9,13 +9,14 @@
     uniform mat4 u_rotateX;
     uniform mat4 u_rotateY;
     uniform mat4 u_rotateZ;
+    uniform mat4 u_translate;
+    uniform mat4 u_perspective;
     void main () {
-        vec4 mid_position = u_rotateX * u_rotateY * u_rotateZ * a_position;
-        // mid_position.xy = mid_position.xy / mid_position.z * 60.0;
-        mid_position = vec4(mid_position.xy / u_size.xy * 2.0 - 1.0, mid_position.z, 1.0);
-        mid_position.z = mid_position.z / u_size.z * 2.0;
-        float divisor = 1.0 + mid_position.z * 2.;
-        mid_position.xy = mid_position.xy / divisor;
+        vec4 mid_position = u_perspective * u_translate * u_rotateX * u_rotateY * u_rotateZ * a_position;
+        // mid_position = vec4(mid_position.xy / u_size.xy * 2.0 - 1.0, mid_position.z, 1.0);
+        // mid_position.z = mid_position.z / u_size.z * 2.0;
+        // float divisor = 1.0 + mid_position.z * 2.;
+        // mid_position.xy = mid_position.xy / divisor;
         gl_Position = mid_position;
         v_color = a_color;
     }
@@ -32,10 +33,32 @@
     }
     const width = 640;
     const height = 360;
+    const near = 0;
+    const far = 1000;
     const canvas = document.createElement('canvas');
+    canvas.style.border = `1px solid #ccc`;
     canvas.width = width;
     canvas.height = height;
     document.body.appendChild(canvas);
+
+    let translateX = util.createEditor('translateX', 'range', -canvas.width, canvas.width, 0, 1);
+    let translateY = util.createEditor('translateY', 'range', -canvas.height, canvas.height, 0, 1);
+    let translateZ = util.createEditor('translateZ', 'range', near - far, far - near, 0, 1);
+    let rotateX = util.createEditor('rotateX', 'range', 0, 360, 0, 1);
+    let rotateY = util.createEditor('rotateY', 'range', 0, 360, 0, 1);
+    let rotateZ = util.createEditor('rotateZ', 'range', 0, 360, 0, 1);
+
+    document.body.appendChild(translateX.ref);
+    document.body.appendChild(translateY.ref);
+    document.body.appendChild(translateZ.ref);
+
+    document.body.appendChild(rotateX.ref);
+    document.body.appendChild(rotateY.ref);
+    document.body.appendChild(rotateZ.ref);
+
+
+
+
     const gl = canvas.getContext('webgl2');
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
@@ -49,12 +72,12 @@
         0, 0, 200, 1.0, 1.0, 0.0,
 
 
-        0, 0, 500, 1.0, 0.0, 1.0,
+        0, 0, 500, 1.0, 1.0, 1.0,
+        300, 300, 500, 1.0, 0.0, 1.0,
         300, 0, 500, 1.0, 0.0, 1.0,
         300, 300, 500, 1.0, 0.0, 1.0,
-        300, 300, 500, 1.0, 0.0, 1.0,
-        0, 300, 500, 1.0, 0.0, 1.0,
         0, 0, 500, 1.0, 0.0, 1.0,
+        0, 300, 500, 1.0, 0.0, 1.0,
 
         0, 0, 200, 0.0, 1.0, 1.0,
         0, 300, 200, 0.0, 1.0, 1.0,
@@ -108,27 +131,81 @@
     gl.vertexAttribPointer(a_color, 3, gl.FLOAT, false, f32size * 6, f32size * 3);
 
     const u_rotateX = gl.getUniformLocation(program, 'u_rotateX');
-    let rotateX = util.createRotateMatrix({
+    let rotateXMat = util.createRotateMatrix({
         x: 150,
         y: 150,
         z: 350
-    }, 30, 'x');
-    gl.uniformMatrix4fv(u_rotateX, false, rotateX);
+    }, 0, 'x');
+    gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
 
     const u_rotateY = gl.getUniformLocation(program, 'u_rotateY');
-    let rotateY = util.createRotateMatrix({
+    let rotateYMat = util.createRotateMatrix({
         x: 150,
         y: 150,
         z: 350
-    }, 90, 'y');
-    gl.uniformMatrix4fv(u_rotateY, false, rotateY);
+    }, 0, 'y');
+    gl.uniformMatrix4fv(u_rotateY, false, rotateYMat);
 
     const u_rotateZ = gl.getUniformLocation(program, 'u_rotateZ');
-    let rotateZ = util.createRotateMatrix({
+    let rotateZMat = util.createRotateMatrix({
         x: 150,
         y: 150,
         z: 350
     }, 0, 'z');
-    gl.uniformMatrix4fv(u_rotateZ, false, rotateZ);
+    gl.uniformMatrix4fv(u_rotateZ, false, rotateZMat);
+
+    
+    const u_translate = gl.getUniformLocation(program, 'u_translate');
+    let translateMat = util.createTranslateMatrix(0, 0, 0);
+    gl.uniformMatrix4fv(u_translate, false, translateMat);
+
+
+    const u_perspective = gl.getUniformLocation(program, 'u_perspective');
+    let perspectiveMat = util.createPerspective(1, width / height, 1, 3000, -canvas.width, canvas.width, canvas.height, -canvas.height);
+    gl.uniformMatrix4fv(u_perspective, false, perspectiveMat);
+
+    function updateTranslate () {
+        translateMat = util.createTranslateMatrix(translateX.value, translateY.value, translateZ.value);
+        gl.uniformMatrix4fv(u_translate, false, translateMat);
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
+    }
+    translateX.oninput = updateTranslate;
+    translateY.oninput = updateTranslate;
+    translateZ.oninput = updateTranslate;
+
+    rotateX.oninput = function () {
+        let rotateXMat = util.createRotateMatrix({
+            x: 150,
+            y: 150,
+            z: 350
+        }, this.value, 'x');
+        gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
+    }
+
+    
+
+    rotateY.oninput = function () {
+        let rotateYMat = util.createRotateMatrix({
+            x: 150,
+            y: 150,
+            z: 350
+        }, this.value, 'y');
+        gl.uniformMatrix4fv(u_rotateY, false, rotateYMat);
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
+    }
+
+    
+
+    rotateZ.oninput = function () {
+        let rotateZMat = util.createRotateMatrix({
+            x: 150,
+            y: 150,
+            z: 350
+        }, this.value, 'z');
+        gl.uniformMatrix4fv(u_rotateZ, false, rotateZMat);
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
+    }
+
 
     gl.drawArrays(gl.TRIANGLES, 0, 36);
