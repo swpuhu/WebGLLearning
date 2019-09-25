@@ -426,6 +426,66 @@ function createNoiseImage(width, height, type, factor) {
 }
 
 
+
+function createPerspective(fieldOfViewRadians, aspect, near, far) {    
+    let f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
+    let rangeInv = 1.0 / (near - far);
+
+    return [
+      f / aspect, 0, 0, 0,
+      0, f, 0, 0,
+      0, 0, (near + far) * rangeInv, -1,
+      0, 0, near * far * rangeInv * 2, 0
+    ];
+}
+
+function createEditor (name, type, min, max, value, step = 1) {
+    let obj = {};
+    let oninput = null;
+    let wrapper = document.createElement('div');
+    let label = document.createElement('label');
+    label.innerText = name;
+    let input = document.createElement('input');
+    input.type = type;
+    input.max = max;
+    input.min = min;
+    input.value = value;
+    input.step = step;
+    input.oninput = function (e) {
+        oninput && oninput.call(this, e);
+    }
+    wrapper.appendChild(label);
+    wrapper.appendChild(input);
+    Object.defineProperties(obj, {
+        oninput: {
+            set (value) {
+                oninput = value;
+            },
+            get () {
+                return oninput;
+            }
+        },
+        ref: {
+            get () {
+                return wrapper;
+            }
+        },
+        step: {
+            set (value) {
+                input.step = value;
+            }
+        },
+        value: {
+            get () {
+                return input.value;
+            }
+        }
+    })
+    return obj;
+}
+
+
+
 export default {
     initWebGL,
     createProjection,
@@ -440,6 +500,8 @@ export default {
     createClipPath,
     createTriangleClipPath,
     createNoiseImage,
+    createPerspective,
     rotate,
     pnpoly,
+    createEditor
 }
