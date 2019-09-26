@@ -11,12 +11,10 @@ uniform mat4 u_rotateY;
 uniform mat4 u_rotateZ;
 uniform mat4 u_translate;
 uniform mat4 u_perspective;
+uniform mat4 u_matrix;
 void main () {
-    vec4 mid_position = u_perspective * u_translate * u_rotateX * u_rotateY * u_rotateZ * a_position;
-    // mid_position = vec4(mid_position.xy / u_size.xy * 2.0 - 1.0, mid_position.z, 1.0);
-    // mid_position.z = mid_position.z / u_size.z * 2.0;
-    // float divisor = 1.0 + mid_position.z * 2.;
-    // mid_position.xy = mid_position.xy / divisor;
+    // vec4 mid_position = u_perspective * u_translate * u_rotateX * u_rotateY * u_rotateZ * a_position;
+    vec4 mid_position = u_matrix * a_position;
     gl_Position = mid_position;
     v_color = a_color;
 }
@@ -34,7 +32,7 @@ void main () {
 const width = 640;
 const height = 360;
 const near = 200;
-const far = 2000;
+const far = 1000;
 const canvas = document.createElement('canvas');
 canvas.style.border = `1px solid #ccc`;
 canvas.width = width;
@@ -47,6 +45,7 @@ let translateZ = util.createEditor('translateZ', 'range', 0, far - near, 0, 1);
 let rotateX = util.createEditor('rotateX', 'range', 0, 360, 0, 1);
 let rotateY = util.createEditor('rotateY', 'range', 0, 360, 0, 1);
 let rotateZ = util.createEditor('rotateZ', 'range', 0, 360, 0, 1);
+let cameraY = util.createEditor('cameraY', 'range', 0, 360, 0, 1);
 
 document.body.appendChild(translateX.ref);
 document.body.appendChild(translateY.ref);
@@ -55,6 +54,7 @@ document.body.appendChild(translateZ.ref);
 document.body.appendChild(rotateX.ref);
 document.body.appendChild(rotateY.ref);
 document.body.appendChild(rotateZ.ref);
+document.body.appendChild(cameraY.ref);
 
 
 
@@ -165,12 +165,37 @@ gl.uniformMatrix4fv(u_translate, false, translateMat);
 
 
 const u_perspective = gl.getUniformLocation(program, 'u_perspective');
-let perspectiveMat = util.createPerspective(2, width / height, 200, 1000, -canvas.width / 2, canvas.width / 2, canvas.height / 2, -canvas.height / 2);
+let perspectiveMat = util.createPerspective(2, width / height, 200, 2000, -canvas.width / 2, canvas.width / 2, canvas.height / 2, -canvas.height / 2);
 gl.uniformMatrix4fv(u_perspective, false, perspectiveMat);
 
-function updateTranslate () {
+
+const u_matrix = gl.getUniformLocation(program, 'u_matrix');
+let matrix = rotateZMat;
+let cameraMatrix = util.createRotateMatrix({
+    x: 0,
+    y: 0,
+    z: 350
+}, 0, 'z');
+
+let cameraTranslate = util.createTranslateMatrix(0, 0, -800);
+
+cameraMatrix = util.multiply(cameraMatrix, cameraTranslate);
+cameraMatrix = util.inverse(cameraMatrix);
+matrix = perspectiveMat;
+matrix = util.multiply(matrix, cameraMatrix);
+
+compulteMatrix();
+
+function compulteMatrix() {
+    gl.uniformMatrix4fv(u_matrix, false, matrix);
+}
+
+
+
+
+function updateTranslate() {
     translateMat = util.createTranslateMatrix(translateX.value, translateY.value, translateZ.value);
-    gl.uniformMatrix4fv(u_translate, false, translateMat);
+    compulteMatrix();
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 translateX.oninput = updateTranslate;
@@ -178,69 +203,99 @@ translateY.oninput = updateTranslate;
 translateZ.oninput = updateTranslate;
 
 rotateX.oninput = function () {
-    let rotateXMat = util.createRotateMatrix({
+    rotateXMat = util.createRotateMatrix({
         x: 0,
         y: 0,
         z: 350
     }, this.value, 'x');
-    gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
+    compulteMatrix();
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 
 
 
 rotateY.oninput = function () {
-    let rotateYMat = util.createRotateMatrix({
+    rotateYMat = util.createRotateMatrix({
         x: 0,
         y: 0,
         z: 350
     }, this.value, 'y');
-    gl.uniformMatrix4fv(u_rotateY, false, rotateYMat);
+    compulteMatrix();
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 
 
 
 rotateZ.oninput = function () {
-    let rotateZMat = util.createRotateMatrix({
+    rotateZMat = util.createRotateMatrix({
         x: 0,
         y: 0,
         z: 350
     }, this.value, 'z');
-    gl.uniformMatrix4fv(u_rotateZ, false, rotateZMat);
+    compulteMatrix();
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 
+cameraY.oninput = function () {
+    cameraMatrix = util.createRotateMatrix({
+        x: 0,
+        y: 0,
+        z: 350
+    }, this.value, 'y');
+    cameraTranslate = util.createTranslateMatrix(0, 0, -800);
+
+    cameraMatrix = util.multiply(cameraMatrix, cameraTranslate);
+    cameraMatrix = util.inverse(cameraMatrix);
+    matrix = perspectiveMat;
+    matrix = util.multiply(matrix, cameraMatrix);
+    draw();
+
+}
 
 gl.drawArrays(gl.TRIANGLES, 0, 36);
 
+let radius = 500;
+let zz = 0;
+function draw() {
+    zz++;
+    for (let i = 0; i < 5; i++) {
+        let angle = i * Math.PI * 2 / 5;
+        let x = Math.cos(angle) * radius;
+        let y = Math.sin(angle) * radius;
 
-let valueX = 0;
-let valueY = 0;
-let valueZ = 0;
-let velocity = 1;
+        let uMatrix = util.multiply(matrix, util.createTranslateMatrix(x, 0, y));
+        uMatrix = util.multiply(uMatrix, util.createRotateMatrix({x: 0, y: 0, z: 350}, zz, 'z'));
+        gl.uniformMatrix4fv(u_matrix, false, uMatrix);
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
+    }
+}
+
+draw();
+
+let y = 0;
+let z = 0;
 function animate() {
-    valueX += velocity;
-    valueY += velocity / 2
-    valueZ += velocity / 3;
-    let rotateXMat = util.createRotateMatrix({
+    y++;
+    z++;
+    cameraMatrix = util.createRotateMatrix({
         x: 0,
         y: 0,
         z: 350
-    }, valueX, 'x');
-    let rotateYMat = util.createRotateMatrix({
+    }, y, 'y');
+    cameraTranslate = util.createTranslateMatrix(0, 0, -800);
+    cameraMatrix = util.multiply(cameraMatrix, util.createRotateMatrix({
         x: 0,
         y: 0,
         z: 350
-    }, valueY, 'y');
-    let rotateZMat = util.createRotateMatrix({
-        x: 0,
-        y: 0,
-        z: 350
-    }, valueZ, 'z');
-    gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
-    gl.uniformMatrix4fv(u_rotateY, false, rotateYMat);
-    gl.uniformMatrix4fv(u_rotateZ, false, rotateZMat);
-    gl.drawArrays(gl.TRIANGLES, 0, 36);
+    }, z, 'z'));
+    cameraMatrix = util.multiply(cameraMatrix, cameraTranslate);
+    cameraMatrix = util.inverse(cameraMatrix);
+    matrix = perspectiveMat;
+    matrix = util.multiply(matrix, cameraMatrix);
+
+    draw();
+
     requestAnimationFrame(animate);
 }
+
+animate();
