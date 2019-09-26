@@ -33,8 +33,8 @@
     }
     const width = 640;
     const height = 360;
-    const near = 0;
-    const far = 1000;
+    const near = 200;
+    const far = 2000;
     const canvas = document.createElement('canvas');
     canvas.style.border = `1px solid #ccc`;
     canvas.width = width;
@@ -43,7 +43,7 @@
 
     let translateX = util.createEditor('translateX', 'range', -canvas.width, canvas.width, 0, 1);
     let translateY = util.createEditor('translateY', 'range', -canvas.height, canvas.height, 0, 1);
-    let translateZ = util.createEditor('translateZ', 'range', near - far, far - near, 0, 1);
+    let translateZ = util.createEditor('translateZ', 'range', 0, far - near, 0, 1);
     let rotateX = util.createEditor('rotateX', 'range', 0, 360, 0, 1);
     let rotateY = util.createEditor('rotateY', 'range', 0, 360, 0, 1);
     let rotateZ = util.createEditor('rotateZ', 'range', 0, 360, 0, 1);
@@ -63,49 +63,53 @@
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
 
+    let l, w, d;
+    l = w = d = 300;
+    
+
     const points = new Float32Array([
-        0, 0, 200, 1.0, 1.0, 0.0,
-        300, 0, 200, 1.0, 1.0, 0.0,
-        300, 300, 200, 1.0, 1.0, 0.0,
-        300, 300, 200, 1.0, 1.0, 0.0,
-        0, 300, 200, 1.0, 1.0, 0.0,
-        0, 0, 200, 1.0, 1.0, 0.0,
+        -l / 2, -l / 2, near, 1.0, 1.0, 0.0,
+        l / 2, -l / 2, near, 1.0, 1.0, 0.0,
+        l / 2, l / 2, near, 1.0, 1.0, 0.0,
+        l / 2, l / 2, near, 1.0, 1.0, 0.0,
+        -l / 2, l / 2, near, 1.0, 1.0, 0.0,
+        -l / 2, -l / 2, near, 1.0, 1.0, 0.0,
 
 
-        0, 0, 500, 1.0, 1.0, 1.0,
-        300, 300, 500, 1.0, 0.0, 1.0,
-        300, 0, 500, 1.0, 0.0, 1.0,
-        300, 300, 500, 1.0, 0.0, 1.0,
-        0, 0, 500, 1.0, 0.0, 1.0,
-        0, 300, 500, 1.0, 0.0, 1.0,
+        -l / 2, -l / 2, near + d, 1.0, 0.2, 0.0,
+        l / 2, l / 2, near + d, 1.0, 0.2, 0.0,
+        l / 2, -l / 2, near + d, 1.0, 0.2, 0.0,
+        -l / 2, l / 2, near + d, 1.0, 0.2, 0.0,
+        l / 2, l / 2, near + d, 1.0, 0.2, 0.0,
+        -l / 2, -l / 2, near + d, 1.0, 0.2, 0.0,
 
-        0, 0, 200, 0.0, 1.0, 1.0,
-        0, 300, 200, 0.0, 1.0, 1.0,
-        0, 0, 500, 0.0, 1.0, 1.0,
-        0, 0, 500, 0.0, 1.0, 1.0,
-        0, 300, 200, 0.0, 1.0, 1.0,
-        0, 300, 500, 0.0, 1.0, 1.0,
+        -l / 2, -l / 2, near, 0.0, 1.0, 1.0,
+        -l / 2, l / 2, near, 0.0, 1.0, 1.0,
+        -l / 2, -l / 2, near + d, 0.0, 1.0, 1.0,
+        -l / 2, -l / 2, near + d, 0.0, 1.0, 1.0,
+        -l / 2, l / 2, near, 0.0, 1.0, 1.0,
+        -l / 2, l / 2, near + d, 0.0, 1.0, 1.0,
 
-        300, 0, 200, 0.0, 0.5, 0.8,
-        300, 0, 500, 0.0, 0.5, 0.8,
-        300, 300, 200, 0.0, 0.5, 0.8,
-        300, 300, 200, 0.0, 0.5, 0.8,
-        300, 0, 500, 0.0, 0.5, 0.8,
-        300, 300, 500, 0.0, 0.5, 0.8,
+        l / 2, -l / 2, near, 0.0, 0.5, 0.8,
+        l / 2, -l / 2, near + d, 0.0, 0.5, 0.8,
+        l / 2, l / 2, near, 0.0, 0.5, 0.8,
+        l / 2, l / 2, near, 0.0, 0.5, 0.8,
+        l / 2, -l / 2, near + d, 0.0, 0.5, 0.8,
+        l / 2, l / 2, near + d, 0.0, 0.5, 0.8,
 
-        0, 300, 200, 0.2, 0.5, 0.6,
-        300, 300, 200, 0.2, 0.5, 0.6,
-        0, 300, 500, 0.2, 0.5, 0.6,
-        0, 300, 500, 0.2, 0.5, 0.6,
-        300, 300, 200, 0.2, 0.5, 0.6,
-        300, 300, 500, 0.2, 0.5, 0.6,
+        -l / 2, l / 2, near, 0.2, 0.5, 0.6,
+        l / 2, l / 2, near, 0.2, 0.5, 0.6,
+        -l / 2, l / 2, near + d, 0.2, 0.5, 0.6,
+        -l / 2, l / 2, near + d, 0.2, 0.5, 0.6,
+        l / 2, l / 2, near, 0.2, 0.5, 0.6,
+        l / 2, l / 2, near + d, 0.2, 0.5, 0.6,
 
-        0, 0, 200, 0.5, 0.5, 0.8,
-        0, 0, 500, 0.5, 0.5, 0.8,
-        300, 0, 200, 0.5, 0.5, 0.8,
-        300, 0, 200, 0.5, 0.5, 0.8,
-        0, 0, 500, 0.5, 0.5, 0.8,
-        300, 0, 500, 0.5, 0.5, 0.8,
+        -l / 2, -l / 2, near, 0.5, 0.5, 0.8,
+        -l / 2, -l / 2, near + d, 0.5, 0.5, 0.8,
+        l / 2, -l / 2, near, 0.5, 0.5, 0.8,
+        l / 2, -l / 2, near, 0.5, 0.5, 0.8,
+        -l / 2, -l / 2, near + d, 0.5, 0.5, 0.8,
+        l / 2, -l / 2, near + d, 0.5, 0.5, 0.8,
 
 
 
@@ -132,36 +136,36 @@
 
     const u_rotateX = gl.getUniformLocation(program, 'u_rotateX');
     let rotateXMat = util.createRotateMatrix({
-        x: 150,
-        y: 150,
-        z: 350
+        x: 0,
+        y: 0,
+        z: 0
     }, 0, 'x');
     gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
 
     const u_rotateY = gl.getUniformLocation(program, 'u_rotateY');
     let rotateYMat = util.createRotateMatrix({
-        x: 150,
-        y: 150,
-        z: 350
+        x: 0,
+        y: 0,
+        z: 0
     }, 0, 'y');
     gl.uniformMatrix4fv(u_rotateY, false, rotateYMat);
 
     const u_rotateZ = gl.getUniformLocation(program, 'u_rotateZ');
     let rotateZMat = util.createRotateMatrix({
-        x: 150,
-        y: 150,
-        z: 350
+        x: 0,
+        y: 0,
+        z: 0
     }, 0, 'z');
     gl.uniformMatrix4fv(u_rotateZ, false, rotateZMat);
 
     
     const u_translate = gl.getUniformLocation(program, 'u_translate');
-    let translateMat = util.createTranslateMatrix(0, 0, 0);
+    let translateMat = util.createTranslateMatrix(0, 0, 120);
     gl.uniformMatrix4fv(u_translate, false, translateMat);
 
 
     const u_perspective = gl.getUniformLocation(program, 'u_perspective');
-    let perspectiveMat = util.createPerspective(1, width / height, 1, 3000, -canvas.width, canvas.width, canvas.height, -canvas.height);
+    let perspectiveMat = util.createPerspective(2, width / height, 200, 1000, -canvas.width / 2, canvas.width / 2, canvas.height / 2, -canvas.height / 2);
     gl.uniformMatrix4fv(u_perspective, false, perspectiveMat);
 
     function updateTranslate () {
@@ -175,8 +179,8 @@
 
     rotateX.oninput = function () {
         let rotateXMat = util.createRotateMatrix({
-            x: 150,
-            y: 150,
+            x: 0,
+            y: 0,
             z: 350
         }, this.value, 'x');
         gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
@@ -187,8 +191,8 @@
 
     rotateY.oninput = function () {
         let rotateYMat = util.createRotateMatrix({
-            x: 150,
-            y: 150,
+            x: 0,
+            y: 0,
             z: 350
         }, this.value, 'y');
         gl.uniformMatrix4fv(u_rotateY, false, rotateYMat);
@@ -199,8 +203,8 @@
 
     rotateZ.oninput = function () {
         let rotateZMat = util.createRotateMatrix({
-            x: 150,
-            y: 150,
+            x: 0,
+            y: 0,
             z: 350
         }, this.value, 'z');
         gl.uniformMatrix4fv(u_rotateZ, false, rotateZMat);
@@ -209,3 +213,36 @@
 
 
     gl.drawArrays(gl.TRIANGLES, 0, 36);
+
+
+    let valueX = 0;
+    let valueY = 0;
+    let valueZ = 0;
+    let velocity = 1;
+    function animate() {
+        valueX += velocity;
+        valueY += velocity / 2
+        valueZ += velocity / 3;
+        let rotateXMat = util.createRotateMatrix({
+            x: 0,
+            y: 0,
+            z: 350
+        }, valueX, 'x');
+        let rotateYMat = util.createRotateMatrix({
+            x: 0,
+            y: 0,
+            z: 350
+        }, valueY, 'y');
+        let rotateZMat = util.createRotateMatrix({
+            x: 0,
+            y: 0,
+            z: 350
+        }, valueZ, 'z');
+        gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
+        gl.uniformMatrix4fv(u_rotateY, false, rotateYMat);
+        gl.uniformMatrix4fv(u_rotateZ, false, rotateZMat);
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
+        requestAnimationFrame(animate);
+    }
+
+    animate();
