@@ -635,9 +635,20 @@ function multiply(a, b) {
     return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
   }
 
+
+  function normalize(v) {
+    var length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    // 确定不会除以 0
+    if (length > 0.00001) {
+      return [v[0] / length, v[1] / length, v[2] / length];
+    } else {
+      return [0, 0, 0];
+    }
+  }
+  
   function lookAt (cameraPosition, target, up) {
     var zAxis = normalize(
-        subtractVectors(cameraPosition, target));
+        subtractVectors(target, cameraPosition));
     var xAxis = normalize(cross(up, zAxis));
     var yAxis = normalize(cross(zAxis, xAxis));
  

@@ -14,8 +14,7 @@ uniform mat4 u_perspective;
 uniform mat4 u_matrix;
 void main () {
     // vec4 mid_position = u_perspective * u_translate * u_rotateX * u_rotateY * u_rotateZ * a_position;
-    // vec4 mid_position = u_matrix * a_position;
-    vec4 mid_position = u_perspective * u_translate * u_rotateX * a_position;
+    vec4 mid_position = u_matrix * a_position;
     gl_Position = mid_position;
     v_color = a_color;
 }
@@ -142,7 +141,7 @@ let rotateXMat = util.createRotateMatrix({
     x: 0,
     y: 0,
     z: 0
-}, 30, 'x');
+}, 0, 'x');
 gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
 
 const u_rotateY = gl.getUniformLocation(program, 'u_rotateY');
@@ -150,7 +149,7 @@ let rotateYMat = util.createRotateMatrix({
     x: 0,
     y: 0,
     z: 0
-}, 30, 'y');
+}, 0, 'y');
 gl.uniformMatrix4fv(u_rotateY, false, rotateYMat);
 
 const u_rotateZ = gl.getUniformLocation(program, 'u_rotateZ');
@@ -158,24 +157,53 @@ let rotateZMat = util.createRotateMatrix({
     x: 0,
     y: 0,
     z: 0
-}, 30, 'z');
+}, 0, 'z');
 gl.uniformMatrix4fv(u_rotateZ, false, rotateZMat);
 
 
 const u_translate = gl.getUniformLocation(program, 'u_translate');
-let translateMat = util.createTranslateMatrix(0, 0, 500);
+let translateMat = util.createTranslateMatrix(0, 0, 0);
 gl.uniformMatrix4fv(u_translate, false, translateMat);
 
 
 const u_perspective = gl.getUniformLocation(program, 'u_perspective');
-let perspectiveMat = util.createPerspective(2, width / height, 200, 1000, -canvas.width / 2, canvas.width / 2, canvas.height / 2, -canvas.height / 2);
+let perspectiveMat = util.createPerspective(2, width / height, 200, 2000, -canvas.width / 2, canvas.width / 2, canvas.height / 2, -canvas.height / 2);
 gl.uniformMatrix4fv(u_perspective, false, perspectiveMat);
+
+
+const u_matrix = gl.getUniformLocation(program, 'u_matrix');
+let matrix = rotateZMat;
+let cameraMatrix = util.createRotateMatrix({
+    x: 0,
+    y: 0,
+    z: 350
+}, 0, 'z');
+
+let cameraTranslate = util.createTranslateMatrix(0, 0, -800);
+cameraMatrix = util.multiply(cameraMatrix, cameraTranslate);
+
+
+let centerPos = [0, 0, 350];
+let cameraPos = [cameraMatrix[12], cameraMatrix[13], cameraMatrix[14]];
+cameraPos = [200, 800, -800];
+cameraMatrix = util.lookAt(cameraPos, centerPos, [0, 1, 0]);
+
+cameraMatrix = util.inverse(cameraMatrix);
+matrix = perspectiveMat;
+matrix = util.multiply(matrix, cameraMatrix);
+
+compulteMatrix();
+
+function compulteMatrix() {
+    gl.uniformMatrix4fv(u_matrix, false, matrix);
+}
+
 
 
 
 function updateTranslate() {
     translateMat = util.createTranslateMatrix(translateX.value, translateY.value, translateZ.value);
-    gl.uniformMatrix4fv(u_translate, false, translateMat);
+    compulteMatrix();
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 translateX.oninput = updateTranslate;
@@ -188,7 +216,7 @@ rotateX.oninput = function () {
         y: 0,
         z: 350
     }, this.value, 'x');
-    gl.uniformMatrix4fv(u_rotateX, false, rotateXMat);
+    compulteMatrix();
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 
@@ -200,6 +228,7 @@ rotateY.oninput = function () {
         y: 0,
         z: 350
     }, this.value, 'y');
+    compulteMatrix();
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 
@@ -211,24 +240,43 @@ rotateZ.oninput = function () {
         y: 0,
         z: 350
     }, this.value, 'z');
+    compulteMatrix();
     gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 
+cameraY.oninput = function () {
+    cameraMatrix = util.createRotateMatrix({
+        x: 0,
+        y: 0,
+        z: 350
+    }, this.value, 'y');
+    cameraTranslate = util.createTranslateMatrix(0, 0, -800);
+    
+    cameraMatrix = util.multiply(cameraMatrix, cameraTranslate);
+    
+    cameraMatrix = util.inverse(cameraMatrix);
+    // console.log(cameraMatrix);
+    matrix = perspectiveMat;
+    matrix = util.multiply(matrix, cameraMatrix);
+    draw();
 
+}
 
-let cameraPos = util.createRotateMatrix({
-    x: 0,
-    y: 0,
-    z: 350
-}, 30, 'x');
+gl.drawArrays(gl.TRIANGLES, 0, 36);
 
-console.log(cameraPos);
-
-
-
-
+let radius = 500;
+let zz = 0;
 function draw() {
-    gl.drawArrays(gl.TRIANGLES, 0, 36);
+    for (let i = 0; i < 5; i++) {
+        let angle = i * Math.PI * 2 / 5;
+        let x = Math.cos(angle) * radius;
+        let y = Math.sin(angle) * radius;
+
+        let uMatrix = util.multiply(matrix, util.createTranslateMatrix(x, 0, y));
+        uMatrix = util.multiply(uMatrix, util.createRotateMatrix({x: 0, y: 0, z: 350}, zz, 'z'));
+        gl.uniformMatrix4fv(u_matrix, false, uMatrix);
+        gl.drawArrays(gl.TRIANGLES, 0, 36);
+    }
 }
 
 draw();
