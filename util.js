@@ -624,6 +624,34 @@ function multiply(a, b) {
     ];
   };
 
+
+  function cross(a, b) {
+    return [a[1] * b[2] - a[2] * b[1],
+            a[2] * b[0] - a[0] * b[2],
+            a[0] * b[1] - a[1] * b[0]];
+  };
+
+  function subtractVectors(a, b) {
+    return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  }
+
+  function lookAt (cameraPosition, target, up) {
+    var zAxis = normalize(
+        subtractVectors(cameraPosition, target));
+    var xAxis = normalize(cross(up, zAxis));
+    var yAxis = normalize(cross(zAxis, xAxis));
+ 
+    return [
+       xAxis[0], xAxis[1], xAxis[2], 0,
+       yAxis[0], yAxis[1], yAxis[2], 0,
+       zAxis[0], zAxis[1], zAxis[2], 0,
+       cameraPosition[0],
+       cameraPosition[1],
+       cameraPosition[2],
+       1,
+    ];
+  }
+
 export default {
     initWebGL,
     createProjection,
@@ -643,5 +671,8 @@ export default {
     pnpoly,
     createEditor,
     inverse,
-    multiply
+    multiply,
+    cross,
+    subtractVectors,
+    lookAt
 }
