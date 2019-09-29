@@ -253,9 +253,12 @@ cameraY.oninput = function () {
     cameraTranslate = util.createTranslateMatrix(0, 0, -800);
     
     cameraMatrix = util.multiply(cameraMatrix, cameraTranslate);
-    
+        
+    cameraPos = [200, 200, -800];
+    cameraMatrix = util.lookAt(cameraPos, centerPos, [0, 1, 0]);
+
     cameraMatrix = util.inverse(cameraMatrix);
-    // console.log(cameraMatrix);
+
     matrix = perspectiveMat;
     matrix = util.multiply(matrix, cameraMatrix);
     draw();
