@@ -167,7 +167,7 @@ gl.uniformMatrix4fv(u_translate, false, translateMat);
 
 
 const u_perspective = gl.getUniformLocation(program, 'u_perspective');
-let perspectiveMat = util.createPerspective(2, width / height, 200, 2000, -canvas.width / 2, canvas.width / 2, canvas.height / 2, -canvas.height / 2);
+let perspectiveMat = util.createPerspective(200, 2000, -canvas.width / 2, canvas.width / 2, canvas.height / 2, -canvas.height / 2);
 gl.uniformMatrix4fv(u_perspective, false, perspectiveMat);
 
 
@@ -270,16 +270,17 @@ gl.drawArrays(gl.TRIANGLES, 0, 36);
 let radius = 500;
 let zz = 0;
 function draw() {
-    for (let i = 0; i < 5; i++) {
-        let angle = i * Math.PI * 2 / 5;
-        let x = Math.cos(angle) * radius;
-        let y = Math.sin(angle) * radius;
+    // for (let i = 0; i < 5; i++) {
+    //     let angle = i * Math.PI * 2 / 5;
+    //     let x = Math.cos(angle) * radius;
+    //     let y = Math.sin(angle) * radius;
 
-        let uMatrix = util.multiply(matrix, util.createTranslateMatrix(x, 0, y));
-        uMatrix = util.multiply(uMatrix, util.createRotateMatrix({x: 0, y: 0, z: 350}, zz, 'z'));
-        gl.uniformMatrix4fv(u_matrix, false, uMatrix);
-        gl.drawArrays(gl.TRIANGLES, 0, 36);
-    }
+    //     let uMatrix = util.multiply(matrix, util.createTranslateMatrix(x, 0, y));
+    //     uMatrix = util.multiply(uMatrix, util.createRotateMatrix({x: 0, y: 0, z: 350}, zz, 'z'));
+    //     gl.uniformMatrix4fv(u_matrix, false, uMatrix);
+    //     gl.drawArrays(gl.TRIANGLES, 0, 36);
+    // }
+    gl.drawArrays(gl.TRIANGLES, 0, 36);
 }
 
 draw();

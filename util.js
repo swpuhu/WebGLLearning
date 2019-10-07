@@ -427,7 +427,7 @@ function createNoiseImage(width, height, type, factor) {
 
 
 
-function createPerspective(fieldOfViewRadians, aspect, near, far, l, r, t ,b) {    
+function createPerspective(near, far, l, r, t ,b) {    
     let rangeInv = 1.0 / (far - near);
 
     let n = near;
