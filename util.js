@@ -451,11 +451,17 @@ function createEditor (name, type = 'range', min, max, value, step = 1) {
     input.min = min;
     input.value = value;
     input.step = step;
+    let display = document.createElement('label');
+    display.textContent = value;
+
     input.oninput = function (e) {
         oninput && oninput.call(this, e);
+        display.textContent = input.value;
     }
+
     wrapper.appendChild(label);
     wrapper.appendChild(input);
+    wrapper.appendChild(display);
     Object.defineProperties(obj, {
         oninput: {
             set (value) {
