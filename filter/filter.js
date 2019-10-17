@@ -167,6 +167,8 @@ export default function (canvas) {
         [Enum_Effect.ZHONGXIA]: zhongxiaFilter
     }
 
+    window.effects = effects;
+
     let effectList = [
         // Enum_Effect.DOUBLE,
         // Enum_Effect.COLOR_OFFSET,
@@ -268,10 +270,9 @@ export default function (canvas) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.useProgram(normal.program);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-
     }
 
+    window.render = render;
 
     function setEffectList(value) {
         effectList = value;

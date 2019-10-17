@@ -65,11 +65,20 @@ delBtn.onclick = function () {
     video.paused && filter.render();
 }
 
+
+let currentUI;
 select.onchange = function () {
     // filter.setEffectList([select.value]);
     // filter.render();
     effectList.length = 0;
     effectList.push(select.value);
+    currentUI && currentUI.remove();
+    if (window.effects[select.value].getElement) {
+        currentUI = window.effects[select.value].getElement();
+        UI.appendChild(currentUI);
+    }
+    video.paused && filter.render(video);
+    
 }
 
 

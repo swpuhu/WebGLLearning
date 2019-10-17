@@ -449,8 +449,8 @@ function createEditor (name, type = 'range', min, max, value, step = 1) {
     input.type = type;
     input.max = max;
     input.min = min;
-    input.value = value;
     input.step = step;
+    input.value = value;
     let display = document.createElement('label');
     display.textContent = value;
 

@@ -129,8 +129,34 @@ export default function (gl, projectionMat) {
         gl.activeTexture(gl.TEXTURE0);
     }
 
+
+    let ui;
+    function createUI () {
+        ui = document.createElement('div');
+        ui.classList.add('ui');
+        let editor = util.createEditor('程度', 'range', 0, 1.0, 0.77, 0.01);
+        ui.appendChild(editor.ref);
+        editor.oninput = function () {
+            if (program !== gl.CURRENT_PROGRAM) {
+                gl.useProgram(program);
+            }
+            const leftIntensity = gl.getUniformLocation(program, 'leftIntensity');
+            gl.uniform1f(leftIntensity, editor.value);
+
+            const rightIntensity = gl.getUniformLocation(program, 'rightIntensity');
+            gl.uniform1f(rightIntensity, editor.value);
+            window.render();
+        }
+        return ui;
+    }
+
+    function getElement() {
+        return ui ? ui : createUI();
+    }
+
     return {
         program,
-        bindMap
+        bindMap,
+        getElement
     }
 }
