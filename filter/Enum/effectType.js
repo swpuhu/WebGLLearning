@@ -19,4 +19,5 @@ export default {
     STENCIL: '蒙版',
     SUNSET: '日落',
     WARM: '温暖',
+    GANGFENG: '剪映-港风'
 }

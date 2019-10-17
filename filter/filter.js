@@ -26,7 +26,7 @@ import Gaussian2 from './gaussianFilter2.js';
 import StencilFilter from './stencilFilter.js';
 import SunsetFilter from './sunsetFilter.js';
 import WarmFilter from './warmFilter.js';
-
+import GangfengFilter from './jy-gangfeng.js';
 
 /**
  * 
@@ -106,6 +106,7 @@ export default function (canvas) {
     const stencilFilter = new StencilFilter(gl, projectionMat);
     const sunsetFilter = new SunsetFilter(gl, projectionMat);
     const warmFilter = new WarmFilter(gl, projectionMat);
+    const gangfengFilter = new GangfengFilter(gl, projectionMat);
 
     const effects = {
         [Enum_Effect.COLOR_OFFSET]: colorOffsetFilter,
@@ -127,7 +128,8 @@ export default function (canvas) {
         [Enum_Effect.STENCIL]: stencilFilter,
         [Enum_Effect.SUNSET]: sunsetFilter,
         [Enum_Effect.WARM]: warmFilter,
-        [Enum_Effect.ANTIQUE]: antiqueFilter
+        [Enum_Effect.ANTIQUE]: antiqueFilter,
+        [Enum_Effect.GANGFENG]: gangfengFilter
     }
 
     let effectList = [
