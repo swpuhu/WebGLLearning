@@ -29,9 +29,9 @@ for (let i = 0; i < keys.length; i++) {
 }
 
 UI.appendChild(select);
-UI.appendChild(list);
-UI.appendChild(addBtn);
-UI.appendChild(delBtn);
+// UI.appendChild(list);
+// UI.appendChild(addBtn);
+// UI.appendChild(delBtn);
 document.body.appendChild(UI);
 
 addBtn.onclick = function () {
@@ -68,6 +68,8 @@ delBtn.onclick = function () {
 select.onchange = function () {
     // filter.setEffectList([select.value]);
     // filter.render();
+    effectList.length = 0;
+    effectList.push(select.value);
 }
 
 

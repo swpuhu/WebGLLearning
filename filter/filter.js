@@ -27,6 +27,17 @@ import StencilFilter from './stencilFilter.js';
 import SunsetFilter from './sunsetFilter.js';
 import WarmFilter from './warmFilter.js';
 import GangfengFilter from './jy-gangfeng.js';
+import JueduihongFilter from './jy-jueduihong.js';
+import LengpanFilter from './jy-lengpan.js';
+import MopianFilter from './jy-mopian.js';
+import NingmengQingFilter from './jy-ningmengqing.js';
+import RiluojuFilter from './jy-riluoju.js';
+import SaiboFilter from './jy-saibopengke.js';
+import WuhouFilter from './jy-wuhou.js';
+import XiariFilter from './jy-xiarizhongqu.js';
+import XianliangFilter from './jy-xianliang.js';
+import ZhengqiboFilter from './jy-zhengqibo.js';
+import ZhongxiaFilter from './jy-zhongxia.js';
 
 /**
  * 
@@ -107,6 +118,19 @@ export default function (canvas) {
     const sunsetFilter = new SunsetFilter(gl, projectionMat);
     const warmFilter = new WarmFilter(gl, projectionMat);
     const gangfengFilter = new GangfengFilter(gl, projectionMat);
+    const jueduihongFilter = new JueduihongFilter(gl, projectionMat);
+    const lengpanFilter = new LengpanFilter(gl, projectionMat);
+    const mopianFilter = new MopianFilter(gl, projectionMat);
+    const ningmengqingFilter = new NingmengQingFilter(gl, projectionMat);
+    const riluojuFilter = new RiluojuFilter(gl, projectionMat);
+    const saiboFilter = new SaiboFilter(gl, projectionMat);
+    const wuhouFilter = new WuhouFilter(gl, projectionMat);
+    const xiariFilter = new XiariFilter(gl, projectionMat);
+    const xianliangFilter = new XianliangFilter(gl, projectionMat);
+    const zhengqiboFilter = new ZhengqiboFilter(gl, projectionMat);
+    const zhongxiaFilter = new ZhongxiaFilter(gl, projectionMat);
+
+
 
     const effects = {
         [Enum_Effect.COLOR_OFFSET]: colorOffsetFilter,
@@ -129,7 +153,18 @@ export default function (canvas) {
         [Enum_Effect.SUNSET]: sunsetFilter,
         [Enum_Effect.WARM]: warmFilter,
         [Enum_Effect.ANTIQUE]: antiqueFilter,
-        [Enum_Effect.GANGFENG]: gangfengFilter
+        [Enum_Effect.GANGFENG]: gangfengFilter,
+        [Enum_Effect.JUEDUIHONG]: jueduihongFilter,
+        [Enum_Effect.LENGPAN]: lengpanFilter,
+        [Enum_Effect.MOPIAN]: mopianFilter,
+        [Enum_Effect.NINGMENGQING]: ningmengqingFilter,
+        [Enum_Effect.RILUOJU]: riluojuFilter,
+        [Enum_Effect.SAIBO]: saiboFilter,
+        [Enum_Effect.WUHOU]: wuhouFilter,
+        [Enum_Effect.XIARIZHONGQU]: xiariFilter,
+        [Enum_Effect.XIANLIANG]: xianliangFilter,
+        [Enum_Effect.ZHENGQIBO]: zhengqiboFilter,
+        [Enum_Effect.ZHONGXIA]: zhongxiaFilter
     }
 
     let effectList = [
@@ -169,113 +204,54 @@ export default function (canvas) {
             gl.deleteFramebuffer(renderFramebuffer);
             gl.deleteRenderbuffer(renderbuffer);
         } else {
-            switch (effectType) {
-                case Enum_Effect.GAUSSIAN:
-                    const radius = 10;
-                    for (let i = 0; i < radius; i++) {
-                        gaussianFilter.setRadius(i);
-                        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                        gl.clear(gl.COLOR_BUFFER_BIT);
-                        gl.drawArrays(gl.TRIANGLES, 0, 6);
-                        gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                        count++;
-                    }
-                    --count;
-                    break;
-                case Enum_Effect.GLOW:
-                    gl.useProgram(gaussianFilter.program);
-                    let glow_radius = 5;
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, addFramebuffer);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, addTexture);
-                    for (let i = 0; i < glow_radius; i++) {
-                        gaussianFilter.setRadius(i);
-                        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                        gl.clear(gl.COLOR_BUFFER_BIT);
-                        gl.drawArrays(gl.TRIANGLES, 0, 6);
-                        gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                        count++;
-                    }
-                    
-                    gl.useProgram(blendFilter.program);
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                    gl.activeTexture(gl.TEXTURE3);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[(count - 1) % 2]);
-                    gl.activeTexture(gl.TEXTURE0);
-                    gl.bindTexture(gl.TEXTURE_2D, addTexture);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                case Enum_Effect.ATOMIZATION:
-                    atomizationFilter.bindMap();
+            if (effectType === Enum_Effect.GAUSSIAN) {
+                const radius = 10;
+                for (let i = 0; i < radius; i++) {
+                    gaussianFilter.setRadius(i);
                     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
                     gl.clear(gl.COLOR_BUFFER_BIT);
                     gl.drawArrays(gl.TRIANGLES, 0, 6);
                     gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                case Enum_Effect.SWIRL:
-                    swirlFilter.setRotate(50);
+                    count++;
+                }
+                --count;
+            } else if (effectType === Enum_Effect.GLOW) {
+                gl.useProgram(gaussianFilter.program);
+                let glow_radius = 5;
+                gl.bindFramebuffer(gl.FRAMEBUFFER, addFramebuffer);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                gl.bindTexture(gl.TEXTURE_2D, addTexture);
+                for (let i = 0; i < glow_radius; i++) {
+                    gaussianFilter.setRadius(i);
                     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
                     gl.clear(gl.COLOR_BUFFER_BIT);
                     gl.drawArrays(gl.TRIANGLES, 0, 6);
                     gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                case Enum_Effect.MASK:
-                    maskFilter.bindMap();
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                case Enum_Effect.INKWELL:
-                    inkWellFilter.bindMap();
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                case Enum_Effect.STENCIL:
-                    stencilFilter.bindMap();
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                case Enum_Effect.SUNSET:
-                    sunsetFilter.bindMap();
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                case Enum_Effect.WARM:
-                    warmFilter.bindMap();
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                case Enum_Effect.ANTIQUE:
-                    antiqueFilter.bindMap();
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-                default:
-                    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    gl.drawArrays(gl.TRIANGLES, 0, 6);
-                    gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
-                    break;
-            }
+                    count++;
+                }
 
+                gl.useProgram(blendFilter.program);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                gl.activeTexture(gl.TEXTURE3);
+                gl.bindTexture(gl.TEXTURE_2D, textures[(count - 1) % 2]);
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, addTexture);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+
+            } else {
+                effects[effectType].bindMap && effects[effectType].bindMap();
+                gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffers[count % 2]);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+            }
         }
         return ++count;
     }
 
     let cacheImg;
-    
+
     async function render(img) {
         if (img !== cacheImg && img) {
             cacheImg = img;

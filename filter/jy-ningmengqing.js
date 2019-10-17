@@ -98,7 +98,7 @@ export default function (gl, projectionMat) {
 
     const texture2Image = new Image();
     const texture2ImageTexture = util.createTexture(gl);
-    texture2Image.src = '../assets/Texture19.png';
+    texture2Image.src = '../assets/Texture27.png';
     texture2Image.onload = function () {
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, texture2ImageTexture);
@@ -108,7 +108,7 @@ export default function (gl, projectionMat) {
 
     const texture3Image = new Image();
     const texture3ImageTexture = util.createTexture(gl);
-    texture3Image.src = '../assets/Texture20.png';
+    texture3Image.src = '../assets/Texture28.png';
     texture3Image.onload = function () {
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, texture3ImageTexture);
