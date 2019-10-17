@@ -8,7 +8,7 @@ const shader = {
 
     uniform mat4 u_projection;
     void main () {
-        gl_Position = u_projection * a_position;
+        gl_Position = u_projection * a_position * vec4(1.0, -1.0, 1.0, 1.0);
         v_texCoord = a_texCoord;
     }
     `,

@@ -37,7 +37,7 @@ export default function (canvas) {
     const width = canvas.width;
     const height = canvas.height;
 
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    // gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     // gl.enable(gl.BLEND);
     // gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
 
