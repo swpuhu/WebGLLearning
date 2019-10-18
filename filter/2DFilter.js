@@ -53,7 +53,7 @@ export default function (gl, projectionMat) {
     const u_translate = gl.getUniformLocation(program, 'u_translate');
     
     let scaleMat = util.createScaleMatrix(1, 1, {x: gl.canvas.width / 2, y: gl.canvas.height / 2});
-    let rotateMat = util.createRotateMatrix({x: gl.canvas.width / 2, y: gl.canvas.height / 2}, 30);
+    let rotateMat = util.createRotateMatrix({x: gl.canvas.width / 2, y: gl.canvas.height / 2}, 0);
     let translateMat = util.createTranslateMatrix(0, 0);
 
     gl.uniformMatrix4fv(u_scale, false, scaleMat);
@@ -78,11 +78,17 @@ export default function (gl, projectionMat) {
     function setProjection(mat) {
         gl.uniformMatrix4fv(u_projection, false, mat);
     }
+
+    function bindMap() {
+
+    }
+
     return {
         program,
         setScale,
         setRotate,
         setTranslate,
-        setProjection
+        setProjection,
+        bindMap
     }
 }

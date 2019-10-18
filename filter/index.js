@@ -32,6 +32,7 @@ UI.appendChild(select);
 // UI.appendChild(list);
 // UI.appendChild(addBtn);
 // UI.appendChild(delBtn);
+effectList.push(select.value);
 document.body.appendChild(UI);
 
 addBtn.onclick = function () {
@@ -104,6 +105,7 @@ function loadImages(srcs) {
 // })
 
 let video = document.createElement('video');
+window.video = video;
 video.src = '../assets/popcart.mp4';
 video.oncanplaythrough = function () {
     filter.render(video);

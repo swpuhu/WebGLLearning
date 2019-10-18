@@ -38,6 +38,32 @@ import XiariFilter from './jy-xiarizhongqu.js';
 import XianliangFilter from './jy-xianliang.js';
 import ZhengqiboFilter from './jy-zhengqibo.js';
 import ZhongxiaFilter from './jy-zhongxia.js';
+import Jy1970Filter from './jy-1970.js';
+import BluesFilter from './jy-blues.js';
+import ChujianFilter from './jy-chujian.js';
+import ChunguangzhaxieFilter from './jy-chunguangzhaxie.js';
+import DunkeerkeFilter from './jy-dunkeerke.js';
+import FushiFilter from './jy-fushi.js';
+import HongyulanFilter from './jy-hongyulan.js';
+import JizhouFilter from './jy-jizhou.js';
+import JiangzhehuFilter from './jy-jzh.js';
+import KekouFilter from './jy-kekou.js';
+import LuoyezongFilter from './jy-luoyezong.js';
+import MujiFilter from './jy-muji.js';
+import MuseFilter from './jy-muse.js';
+import NihongguangFilter from './jy-nihongguang.js';
+import NiupizhiFilter from './jy-niupizhi.js';
+import QinkongFilter from './jy-qingkong.js';
+import QingtouFilter from './jy-qingtou.js';
+import RishiFilter from './jy-rishi.js';
+import ShangweiFilter from './jy-shangwei.js';
+import VintageFilter from './jy-vintage.js';
+import WenxiangshirenFilter from './jy-wenxiangshiren.js';
+import WushanFilter from './jy-wushan.js';
+import XioazhunFilter from './jy-xiaozhun.js';
+import YuantuFilter from './jy-yuantu.js';
+import ZiranFilter from './jy-ziran.js';
+
 
 /**
  * 
@@ -129,10 +155,35 @@ export default function (canvas) {
     const xianliangFilter = new XianliangFilter(gl, projectionMat);
     const zhengqiboFilter = new ZhengqiboFilter(gl, projectionMat);
     const zhongxiaFilter = new ZhongxiaFilter(gl, projectionMat);
-
+    const jy1970Filter = new Jy1970Filter(gl, projectionMat);
+    const bluesFilter = new BluesFilter(gl, projectionMat);
+    const chujianFilter = new ChujianFilter(gl, projectionMat);
+    const chunguangzhaxieFilter = new ChunguangzhaxieFilter(gl, projectionMat);
+    const dunkeerkeFilter = new DunkeerkeFilter(gl, projectionMat);
+    const fushiFilter = new FushiFilter(gl, projectionMat);
+    const hongyulanFilter = new HongyulanFilter(gl, projectionMat);
+    const jizhouFilter = new JizhouFilter(gl, projectionMat);
+    const jzhFilter = new JiangzhehuFilter(gl, projectionMat);
+    const kekouFilter = new KekouFilter(gl, projectionMat);
+    const luoyezongFilter = new LuoyezongFilter(gl, projectionMat);
+    const mujiFilter = new MujiFilter(gl, projectionMat);
+    const museFilter = new MuseFilter(gl, projectionMat);
+    const nihongguangFilter = new NihongguangFilter(gl, projectionMat);
+    const niupizhiFilter = new NiupizhiFilter(gl, projectionMat);
+    const qingkongFilter = new QinkongFilter(gl, projectionMat);
+    const qingtouFilter = new QingtouFilter(gl, projectionMat);
+    const rishiFilter = new RishiFilter(gl, projectionMat);
+    const shangweiFilter = new ShangweiFilter(gl, projectionMat);
+    const vintageFilter = new VintageFilter(gl, projectionMat);
+    const wenxiangshirenFilter = new WenxiangshirenFilter(gl, projectionMat);
+    const wushanFilter = new WushanFilter(gl, projectionMat);
+    const xiaozhunFilter = new XioazhunFilter(gl, projectionMat);
+    const yuantuFilter = new YuantuFilter(gl, projectionMat);
+    const ziranFilter = new ZiranFilter(gl, projectionMat);
 
 
     const effects = {
+        [Enum_Effect.NONE]: doubleFilter,
         [Enum_Effect.COLOR_OFFSET]: colorOffsetFilter,
         [Enum_Effect.NEGATIVE]: negativeFilter,
         [Enum_Effect.DOUBLE]: doubleFilter,
@@ -164,7 +215,31 @@ export default function (canvas) {
         [Enum_Effect.XIARIZHONGQU]: xiariFilter,
         [Enum_Effect.XIANLIANG]: xianliangFilter,
         [Enum_Effect.ZHENGQIBO]: zhengqiboFilter,
-        [Enum_Effect.ZHONGXIA]: zhongxiaFilter
+        [Enum_Effect.ZHONGXIA]: zhongxiaFilter,
+        [Enum_Effect.JY1970]: jy1970Filter,
+        [Enum_Effect.CHUJIAN]: chujianFilter,
+        [Enum_Effect.CHUANGGUANGZHAXIE]: chunguangzhaxieFilter,
+        [Enum_Effect.DUNKEERKE]: dunkeerkeFilter,
+        [Enum_Effect.FUSHI]: fushiFilter,
+        [Enum_Effect.HONGYULAN]: hongyulanFilter,
+        [Enum_Effect.JIZHOU]: jizhouFilter,
+        [Enum_Effect.JZH]: jzhFilter,
+        [Enum_Effect.KEKOU]: kekouFilter,
+        [Enum_Effect.LUOYEZONG]: luoyezongFilter,
+        [Enum_Effect.MUJI]: mujiFilter,
+        [Enum_Effect.MUSE]: museFilter,
+        [Enum_Effect.NIHONGGUANG]: nihongguangFilter,
+        [Enum_Effect.NIUPIZHI]: niupizhiFilter,
+        [Enum_Effect.QINGKONG]: qingkongFilter,
+        [Enum_Effect.QINGTOU]: qingtouFilter,
+        [Enum_Effect.RISHI]: rishiFilter,
+        [Enum_Effect.SHANGWEI]: shangweiFilter,
+        [Enum_Effect.VINTAGE]: vintageFilter,
+        [Enum_Effect.WENXIANGSHIREN]: wenxiangshirenFilter,
+        [Enum_Effect.WUSHAN]: wushanFilter,
+        [Enum_Effect.XIAOZHUN]: xiaozhunFilter,
+        [Enum_Effect.YUANTU]: yuantuFilter,
+        [Enum_Effect.ZIRAN]: ziranFilter
     }
 
     window.effects = effects;

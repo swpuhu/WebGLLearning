@@ -102,7 +102,7 @@ function createRotateMatrix(center, rotate, axis = 'z') {
  * @param {Number} tx
  * @param {Number} ty
  */
-function createTranslateMatrix(tx, ty, tz) {
+function createTranslateMatrix(tx = 0, ty = 0, tz = 0) {
     return new Float32Array([
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
