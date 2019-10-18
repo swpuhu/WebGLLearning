@@ -51,9 +51,9 @@ inputFile.onchange = function () {
         context.putImageData(data, 0, 0);
 
         let img = new Image();
-        img.src = '../assets/gaoda1.jpg';
+        img.src = '../assets/xiangrikui.jpg';
         img.onload = function () {
-            ctx2.drawImage(img, 0, 0);
+            ctx2.drawImage(img, 0, 0, canvas2.width, canvas2.height);
             let imgData = ctx2.getImageData(0, 0, width, height);
             for (let i = 0; i < imgData.data.length; i += 4) {
                 let r = imgData.data[i] >> 2;
