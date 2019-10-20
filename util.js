@@ -115,16 +115,18 @@ function createTranslateMatrix(tx = 0, ty = 0, tz = 0) {
  *
  * @param {Number} scaleX
  * @param {Number} scaleY
+ * @param {Number} scaleZ
  */
-function createScaleMatrix(scaleX, scaleY, center = {
+function createScaleMatrix(scaleX, scaleY, scaleZ, center = {
     x: 0,
-    y: 0
+    y: 0,
+    z: 0
 }) {
     return new Float32Array([
         scaleX, 0.0, 0.0, 0.0,
         0.0, scaleY, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
-        -scaleX * center.x + center.x, -scaleY * center.y + center.y, 0.0, 1.0,
+        -scaleX * center.x + center.x, -scaleY * center.y + center.y, -scaleZ * center.z + center.z, 1.0,
     ]);
 }
 
