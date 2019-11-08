@@ -15,8 +15,33 @@ const shaders = {
     precision mediump float;
     varying vec2 v_texCoord;
     uniform sampler2D u_texture;
+    uniform float u_high[3];
+    uniform float u_mid[3];
+    uniform float u_low[3];
     void main () {
-        gl_FragColor = texture2D(u_texture, v_texCoord);
+        vec4 color = texture2D(u_texture, v_texCoord);
+        float r = color.r;
+        float g = color.g;
+        float b = color.b;
+        if (r <= u_mid[0]) {
+            r = (r - u_low[0]) / (u_mid[0] - u_low[0]) * 0.5;
+        } else {
+            r = (r - u_mid[0]) / (u_high[0] - u_mid[0]) * 0.5 + (127.0 / 255.0);
+        }
+        
+        if (g <= u_mid[1]) {
+            g = (g - u_low[1]) / (u_mid[1] - u_low[1]) * 0.5;
+        } else {
+            g = (g - u_mid[1]) / (u_high[1] - u_mid[1]) * 0.5 + (127.0 / 255.0);
+        }
+
+        
+        if (b <= u_mid[2]) {
+            b = (b - u_low[2]) / (u_mid[2] - u_low[2]) * 0.5;
+        } else {
+            b = (b - u_mid[2]) / (u_high[2] - u_mid[2]) * 0.5 + (127.0 / 255.0);
+        }
+        gl_FragColor = vec4(r, g, b, color.a);
     }
     `
 };
@@ -68,15 +93,36 @@ let u_projection = gl.getUniformLocation(program, 'u_projection');
 let projectionMat = util.createProjection(width, height, 1);
 gl.uniformMatrix4fv(u_projection, false, projectionMat);
 
+
+let rgbLevel = [[0, 0, 0], [128, 128, 128], [255, 255, 255]];
+let u_high = gl.getUniformLocation(program, 'u_high');
+let u_mid = gl.getUniformLocation(program, 'u_mid');
+let u_low = gl.getUniformLocation(program, 'u_low');
+
+let highLevel = rgbLevel[2];
+let midLevel = rgbLevel[1];
+let lowLevel = rgbLevel[0];
+
+gl.uniform1fv(u_high, highLevel);
+gl.uniform1fv(u_mid, midLevel);
+gl.uniform1fv(u_low, lowLevel);
+
 let image = new Image();
 image.src = '../assets/gaoda1.jpg';
 
 function draw() {
+    
+    highLevel = rgbLevel[2].map(item => item / 255);
+    midLevel = rgbLevel[1].map(item => item / 255);
+    lowLevel = rgbLevel[0].map(item => item / 255);
+
+    gl.uniform1fv(u_high, highLevel);
+    gl.uniform1fv(u_mid, midLevel);
+    gl.uniform1fv(u_low, lowLevel);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
 
-let rgbLevel = [[0, 0, 0], [128, 128, 128], [255, 255, 255]];
 image.onload = function () {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     draw();
@@ -108,6 +154,7 @@ canvas.onclick = function (e) {
         rgbLevel[2][1] = rgba[1];
         rgbLevel[2][2] = rgba[2];
     }
+    draw();
     currentColor.style.backgroundColor = `rgba(${rgba[0]}, ${rgba[1]}, ${rgba[2]}, ${rgba[3] / 255})`
     console.log(rgbLevel);
 
