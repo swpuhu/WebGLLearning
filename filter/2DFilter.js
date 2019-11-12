@@ -21,8 +21,11 @@ const shader = {
     in vec2 v_texCoord;
     uniform sampler2D u_texture;
     uniform vec2 u_resolution;
+    uniform float u_alpha;
     void main () {
-        out_color = texture(u_texture, v_texCoord);
+        vec4 color = texture(u_texture, v_texCoord);
+        out_color = vec4(color.rgb, color.a * u_alpha);
+        
     }
     `
 }
@@ -60,6 +63,9 @@ export default function (gl, projectionMat) {
     gl.uniformMatrix4fv(u_rotate, false, rotateMat);
     gl.uniformMatrix4fv(u_translate, false, translateMat);
 
+    const u_alpha = gl.getUniformLocation(program, 'u_alpha');
+    gl.uniform1f(u_alpha, 1);
+
     function setRotate(rotate, center) {
         rotateMat = util.createRotateMatrix({x: center.x, y: center.y}, rotate);
         gl.uniformMatrix4fv(u_rotate, false, rotateMat);
@@ -79,6 +85,10 @@ export default function (gl, projectionMat) {
         gl.uniformMatrix4fv(u_projection, false, mat);
     }
 
+    function setAlpha(alpha) {
+        gl.uniform1f(u_alpha, alpha);
+    }
+
     function bindMap() {
 
     }
@@ -89,6 +99,7 @@ export default function (gl, projectionMat) {
         setRotate,
         setTranslate,
         setProjection,
-        bindMap
+        bindMap,
+        setAlpha
     }
 }
