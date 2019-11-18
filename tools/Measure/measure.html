@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .relative {
+            position: relative;
+        }
+        
+        #div {
+            width: 640px;
+            height: 320px;
+        }
+        .measure-wrapper {
+            border: 1px solid #08eeff;
+        }
+        .toolbar-icon {
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            margin: 10px;
+            border-radius: 10px;
+            background-color: #aaa;
+            color: #fff;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .toolbar-icon.active {
+            background-color: #eeaa00;
+        }
+
+        .toolbar-draw {
+            border: 1px solid #aaa;
+            
+        }
+
+        .toolbar-draw__wrapper {
+            display: flex;
+        }
+
+        .toolbar-draw__title {
+            border-bottom: 1px solid #aaa;
+            padding: 5px 10px;
+            box-sizing: border-box;
+        }
+
+        .measure-message {
+            display: flex;
+            width: 100%;
+            min-height: 100px;
+        }
+
+        .measure-message .message-position {
+            flex-basis: 200px;
+            border: 1px solid #aaa;
+            margin-top: 15px;
+            padding: 5px;
+        }
+        .message-position .position {
+            display: flex;
+            height: 24px;
+            line-height: 24px;
+        }
+
+        .message-position .position-title {
+            flex: 1;
+        }
+
+        .message-position .position-coord {
+            flex-basis: 100px;
+        }
+
+        
+
+        .measure-message .message-entityinfo {
+            flex-basis: 200px;
+            border: 1px solid #aaa;
+            margin-top: 15px;
+            margin-left: 15px;
+            padding: 5px;
+        }
+        .message-entityinfo .entity-item {
+            display: flex;
+        }
+
+        .message-entityinfo .entity-item .entity-item__title {
+            flex-basis: 60%;
+        }
+
+        .message-entityinfo .entity-item .entity-item__content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <p id="div">
+        
+    </p>
+</body>
+<script type="module">
+import Measure from './index.js';
+
+let lorem = document.getElementById('div');
+let measure = new Measure(lorem);
+document.body.appendChild(measure.controlUI);
+document.body.appendChild(measure.messageUI);
+
+</script>
+</html>
