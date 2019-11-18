@@ -41,7 +41,7 @@ const fragmentShader = `
         float dist = 1. - smoothstep(0. ,2., pos.y - y);
         y = -N * sqrt(1. - (pos.x * pos.x) / (M * M));
         float dist2 =  smoothstep(0., 2., pos.y - y);
-        dist *= dist2;
+        // dist *= dist2;
         vec3 color = vec3(dist);
         gl_FragColor = vec4(color, 1.);
     }

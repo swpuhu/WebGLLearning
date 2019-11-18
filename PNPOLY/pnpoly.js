@@ -22,10 +22,11 @@ const vertexShader = `#version 300 es
 `
 
 const fragmentShader = `#version 300 es
+    #define TERMINAL -10000.0
     precision mediump float;
     in vec2 v_texCoord;
     uniform sampler2D u_texture;
-    uniform float u_points[6];
+    uniform float u_points[50];
     uniform vec2 u_resolution;
     out vec4 out_color;
 
@@ -41,7 +42,7 @@ const fragmentShader = `#version 300 es
     vec2 getMinDistance(float array[6], float x, float y) {
         float number = 6.;
         float minDistance;
-        float isIn = 1.0;
+        float isIn = -1.0;
         for (float i = 0.; i < number; i += 2.) {
             int index = int(mod(i, number));
             int nextIndex = int(mod(i + 2.0, number));
@@ -50,32 +51,60 @@ const fragmentShader = `#version 300 es
             float x2 = array[nextIndex];
             float y2 = array[nextIndex + 1];
             float d = getDistance(vec2(x1, y1), vec2(x2, y2), vec2(x, y));
+            float d2 = distance(vec2(x1, y1), vec2(x, y));
+            d = min(abs(d), d2);
             if (i == 0.0) {
-                minDistance = d;
+                minDistance = abs(d);
             } else {
                 if (abs(d) < minDistance) {
                     minDistance = abs(d);
                 }
             }
+
+            if (((y2 > y) != (y1 > y)) && 
+                (x < (x1 - x2) * (y - y2) / (y1 - y2) + x2)) {
+                    isIn *= -1.0;
+                }
             
-            isIn = d * isIn;
+        }
+        if (isIn < 0.) {
+            isIn = 0.0;
         }
         return vec2(isIn, minDistance);
     }
 
     void main () {
         vec2 pos = gl_FragCoord.xy;
-        // float d = getDistance(vec2(u_points[0], u_points[1]), vec2(u_points[2], u_points[3]), pos);
-        vec2 d = getMinDistance(u_points, pos.x, pos.y);
-        // if (d[0] <= 0.) {
-        //     out_color = vec4(0.0, 0.0, 0.0, 1.0);
-        // } else {
-        //     float dist = smoothstep(0.0, 1.0, d[1]);
-        //     out_color = vec4(dist, dist, dist, 1.0);
-
+        int number = 0;
+        for (int i = 0; i < 50; i++) {
+            if (u_points[i] == TERMINAL) {
+                number = i;
+                break;
+            }
+        }
+        vec2 d = vec2(0.0, 0.0);
+        float arr[6];
+        for (int i = 0; i < number; i += 6) {
+            arr[0] = u_points[i];
+            arr[1] = u_points[i + 1];
+            arr[2] = u_points[i + 2];
+            arr[3] = u_points[i + 3];
+            arr[4] = u_points[i + 4];
+            arr[5] = u_points[i + 5];
+            vec2 _d = getMinDistance(arr, pos.x, pos.y);
+            if (_d.x > 0.0) {
+                d = _d;
+            }
+        }
+        // vec2 d = getMinDistance(u_points, pos.x, pos.y);
+        
+        float dist = smoothstep(0.0, 2.0, abs(d[1]));
+        vec3 color = dist * vec3(0.0, 0.5, 1.0);
+        // if (d[0] <= 0.0) {
+        //     color = vec3(0.0, 0.0, 0.0);
         // }
-        float dist = smoothstep(0.0, 1.0, abs(d[1]));
-        out_color = vec4(dist, dist, dist, 1.0);
+        out_color = vec4(color, 1.0);
+        
     }
 `
 let scale = 1;
@@ -110,9 +139,16 @@ gl.uniform2f(u_resolution, width, height);
 
 let u_points = gl.getUniformLocation(program, 'u_points');
 let clipPath = [
-    0.0, 0.0,
-    width / 2, height,
-    width, 0
+    width / 4, height / 4,
+    width / 2, height / 2,
+    width / 4 * 3, height / 4,
+    
+    width / 4, height / 4,
+    0, height / 2,
+    width / 4 * 3, height / 4,
+    // width / 4 * 3, 0,
+    // 0, 0,
+    -10000.0
 ];
 gl.uniform1fv(u_points, clipPath);
 gl.drawArrays(gl.TRIANGLES, 0, 6);
