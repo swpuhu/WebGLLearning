@@ -7,21 +7,26 @@ class Complex {
 
 /**
  * 
- * @param {Complex} complex1 
- * @param {Complex} complex2 
+ * @param {Complex} a 
+ * @param {Complex} b 
  */
-function complexAdd(complex1, complex2) {
-    let re, im;
-    re = complex1.re + complex2.re;
-    im = complex1.im + complex2.im;
-    return new Complex(re, im);
+function complexAdd(a, b) {
+    let ret = new Complex();
+    ret.re = a.re + b.re;
+    ret.im = a.im + b.im;
+    return ret;
 }
 
-function complexMulti(complex1, complex2) {
-    let re, im;
-    re = complex1.re * complex2.re - complex1.im * complex2.im;
-    im = complex1.re * complex2.im + complex1.im * complex2.re;
-    return new Complex(re, im);
+/**
+ * 
+ * @param {Complex} a 
+ * @param {Complex} b 
+ */
+function complexMulti(a, b) {
+    let ret = new Complex();
+    ret.re = a.re * b.re - a.im * b.im;
+    ret.im = a.im * b.re + a.re * b.im;
+    return ret;
 }
 
 function DFT(x, N) {
@@ -38,15 +43,27 @@ function DFT(x, N) {
     }
     return X;
 }
+function DFT(x, N) {
+    let wnk = new Complex();
+    let X = new Array(N);
+    for (let k = 0; k < N; k++) {
+        X[k] = new Complex(0, 0);
+        for (let n = 0; n < N; n++) {
+            wnk.re = Math.cos(2 * Math.PI * k * n / N);
+            wnk.im = -Math.sin(2 * Math.PI * k * n / N);
+            X[k] = complexAdd(X[k], complexMulti(x[n], wnk));
+        }
+    }
+    return X;
+}
 
 
 function IDFT(X, N) {
+    let ejw = new Complex();
     let x = new Array(N);
-    let k, n;
-    let ejw = new Complex(0, 0);
-    for (k = 0; k < N; k++) {
+    for (let k = 0; k < N; k++) {
         x[k] = new Complex(0, 0);
-        for (n = 0; n < N; n++) {
+        for (let n = 0; n < N; n++) {
             ejw.re = Math.cos(2 * Math.PI * k * n / N);
             ejw.im = Math.sin(2 * Math.PI * k * n / N);
             x[k] = complexAdd(x[k], complexMulti(X[n], ejw));
@@ -56,13 +73,16 @@ function IDFT(X, N) {
     }
     return x;
 }
-let x = [];
+
+
+
+let samples = [];
 let n = 10;
 for (let i = 0; i < n; i++) {
     let complex = new Complex(i, 0);
-    x.push(complex);
+    samples.push(complex);
 }
-let X = DFT(x, n);
+let X = DFT(samples, n);
 console.log(X);
 let ix = IDFT(X, n);
 console.log(ix);
