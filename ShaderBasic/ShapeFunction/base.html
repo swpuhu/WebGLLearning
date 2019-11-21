@@ -5,9 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+        }
+        canvas {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
 </head>
 <body>
-    <canvas width="640" height="360" id="canvas"></canvas>
+    <canvas width="1920" height="1080" id="canvas"></canvas>
 </body>
 
 <script type="module">
@@ -23,27 +32,30 @@ const fragmentShader = `
     #define PI 3.14159265359
     precision mediump float;
     uniform vec2 u_resolution;
-
+    uniform float u_time;
     mat2 rotate2d(float _angle){
     return mat2(cos(_angle),-sin(_angle),
                 sin(_angle),cos(_angle));
     }
+
+    float random (vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))*
+        43758.5453123);
+    }
+
     void main () {
-        vec2 pos = gl_FragCoord.xy;
-        pos -= vec2(320., 180.);
-        pos = vec2(1.0, 0.8) * pos;
-        // pos = rotate2d( 0.1 * PI ) * pos;
-        pos -= vec2(100., 50.);
+        vec2 pos = gl_FragCoord.xy / u_resolution;
         
-        float M = 300.;
-        float N = 100.;
-        float y = N * sqrt(1. - (pos.x * pos.x) / (M * M));
-        float dist = 1. - smoothstep(0. ,2., pos.y - y);
-        y = -N * sqrt(1. - (pos.x * pos.x) / (M * M));
-        float dist2 =  smoothstep(0., 2., pos.y - y);
-        // dist *= dist2;
-        vec3 color = vec3(dist);
-        gl_FragColor = vec4(color, 1.);
+        float dist = abs(pos.y - 0.01 * sin(pos.x * 8. + u_time) - 0.5);
+        dist = 1. / dist;
+        dist = pow(dist, 1.);
+        dist *= 0.01;
+      
+        vec3 color = dist *  vec3(0.5, 0.2, 1.0);
+        color = 1.0 - exp(-color);
+        gl_FragColor = vec4(color, 1.0);
+
     }
 `
 
@@ -125,7 +137,19 @@ gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, f32size * 2, 0);
 let u_resolution = gl.getUniformLocation(program, 'u_resolution');
 gl.uniform2f(u_resolution, canvas.width, canvas.height);
 
-gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+let u_time = gl.getUniformLocation(program, 'u_time');
+let time = 0;
+
+
+function draw() {
+    time += 0.1;
+    gl.uniform1f(u_time, time);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(draw);
+}
+draw();
+
 
 </script>
 </html>
