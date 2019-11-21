@@ -30,20 +30,6 @@ function complexMulti(a, b) {
 }
 
 function DFT(x, N) {
-    let X = new Array(N);
-    let k, n;
-    let wnk = new Complex(0, 0);
-    for (k = 0; k < N; k++) {
-        X[k] = new Complex(0, 0);
-        for (n = 0; n < N; n++) {
-            wnk.re = Math.cos(2 * Math.PI * k * n / N);
-            wnk.im = -Math.sin(2 * Math.PI * k * n / N);
-            X[k] = complexAdd(X[k], complexMulti(x[n], wnk));
-        }
-    }
-    return X;
-}
-function DFT(x, N) {
     let wnk = new Complex();
     let X = new Array(N);
     for (let k = 0; k < N; k++) {
@@ -76,13 +62,11 @@ function IDFT(X, N) {
 
 
 
-let samples = [];
-let n = 10;
-for (let i = 0; i < n; i++) {
-    let complex = new Complex(i, 0);
-    samples.push(complex);
-}
-let X = DFT(samples, n);
-console.log(X);
-let ix = IDFT(X, n);
-console.log(ix);
+// let samples = [];
+// let n = 90;
+// for (let i = 0; i < n; i++) {
+//     let complex = new Complex(Math.sin(10 * Math.PI * i * Math.PI / 180), 0);
+//     samples.push(complex);
+// }
+// let X = DFT(samples, n);
+// console.log(X);
