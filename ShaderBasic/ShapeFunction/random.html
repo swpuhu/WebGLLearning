@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas width="640" height="360" id="canvas"></canvas>
+</body>
+
+<script type="module">
+    import util from '../../util.js';
+const vertexShader = `
+    attribute vec4 a_position;
+    void main () {
+        gl_Position = a_position;
+    }
+`
+
+const fragmentShader = `
+    #define PI 3.14159265359
+    precision mediump float;
+    uniform vec2 u_resolution;
+    uniform float u_time;
+    mat2 rotate2d(float _angle){
+    return mat2(cos(_angle),-sin(_angle),
+                sin(_angle),cos(_angle));
+    }
+
+    float random (vec2 st) {
+        return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);    
+    }
+
+    float noise(vec2 st) {
+        vec2 i = floor(st);
+        vec2 f = fract(st);
+        float a = random(i);
+        float b = random(i + vec2(1.0, 0.0));
+        float c = random(i + vec2(1.0, 1.0));
+        float d = random(i + vec2(0.0, 1.0));
+
+        vec2 u = smoothstep(0.0, 1.0, f);
+        // return mix(a, b, u.x);
+        return mix(a, b, u.x) + (d - a) * u.y * (1. - u.x) + (c - b) * u.x * u.y;
+    }
+
+    void main () {
+        vec2 pos = gl_FragCoord.xy / u_resolution;
+        float len = length(pos - vec2(0.5));
+        float n = smoothstep(0., random(pos), len);
+
+        gl_FragColor = vec4(vec3(n), 1.0);
+    }
+`
+let canvas = document.getElementById('canvas');
+let gl = canvas.getContext('webgl2');
+let program = util.initWebGL(gl, vertexShader, fragmentShader);
+gl.useProgram(program);
+
+let points = new Float32Array([
+    -1.0, -1.0,
+    1.0, -1.0,
+    1.0, 1.0,
+    1.0, 1.0,
+    -1.0, 1.0,
+    -1.0, -1.0
+]);
+const f32size = Float32Array.BYTES_PER_ELEMENT;
+
+let buffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+let a_position = gl.getAttribLocation(program, 'a_position');
+gl.enableVertexAttribArray(a_position);
+gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, f32size * 2, 0);
+let u_resolution = gl.getUniformLocation(program, 'u_resolution');
+gl.uniform2f(u_resolution, canvas.width, canvas.height);
+
+
+gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+
+</script>
+
+</html>
