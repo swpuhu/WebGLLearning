@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        video {
+            /* display: none; */
+        }
+    </style>
+</head>
+<body>
+    <!-- <video loop id="video1" width="640" height="360" src="http://localhost:8081/assets/Gop25_20191127143122_low.mp4" controls></video> -->
+    <video loop id="video1" width="640" height="360" src="http://localhost:8081/assets/Hi2180-loKey_20191127170610_high.mp4" controls></video>
+    <!-- <video loop id="video1" width="640" height="360" src="http://localhost:8081/mpdAssets/popcart.mp4" controls></video> -->
+    
+    <div>
+            <video loop id="video2" width="640" height="360" src="http://localhost:8081/assets/Hi2180-loKey_20191127170610_high.key.NewKey.mp4" controls/>
+            <!-- <video loop id="video2" width="640" height="360" src="http://localhost:8081/assets/Gop25_20191127143122_low.key.NewKey.mp4" controls/> -->
+    </div>
+    
+    <div style="background-image: url('http://localhost:8081/assets/icon.jpg');">
+        <canvas id="canvas" width="640" height="360"></canvas>
+    </div>
+    
+    
+</body>
+<script type="module">
+    import util from './util.js';
+    const vertexShader = `
+        attribute vec4 a_position;
+        attribute vec2 a_texCoord;
+        varying vec2 v_texCoord;
+        void main () {
+            gl_Position = a_position;
+            v_texCoord = a_texCoord;
+        }
+    `;
+
+    const fragmentShader = `
+        precision mediump float;
+        uniform vec2 u_resolution;
+        uniform sampler2D u_texture1;
+        uniform sampler2D u_texture2;
+        varying vec2 v_texCoord;
+        void main () {
+            vec4 color1 = texture2D(u_texture1, v_texCoord);
+            vec4 color2 = texture2D(u_texture2, v_texCoord);
+            gl_FragColor = vec4(color1.rgb, color1.a * color2.r);
+            // gl_FragColor = color1;
+        }
+
+    `;
+    let canvas = document.getElementById('canvas');
+    let gl = canvas.getContext('webgl');
+    window.gl = gl;
+    gl.enable(gl.BLEND);
+
+    gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+    let program = util.initWebGL(gl, vertexShader, fragmentShader);
+    gl.useProgram(program);
+    let points = new Float32Array([
+        -1.0, -1.0, 0.0, 0.0,
+        1.0, -1.0, 1.0, 0.0,
+        1.0, 1.0, 1.0, 1.0,
+        1.0, 1.0, 1.0, 1.0,
+        -1.0, 1.0, 0.0, 1.0,
+        -1.0, -1.0, 0.0, 0.0
+    ]);
+    
+    let buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+    let f32size = Float32Array.BYTES_PER_ELEMENT;
+
+    let texture1 = util.createTexture(gl);
+    let texture2 = util.createTexture(gl);
+    let u_texture1 = gl.getUniformLocation(program, 'u_texture1')
+    gl.uniform1i(u_texture1, 0);
+
+    let u_texture2 = gl.getUniformLocation(program, 'u_texture2')
+    gl.uniform1i(u_texture2, 1);
+
+    let a_position = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(a_position);
+    gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, f32size * 4, 0);
+
+    
+    let a_texCoord = gl.getAttribLocation(program, 'a_texCoord');
+    gl.enableVertexAttribArray(a_texCoord);
+    gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, f32size * 4, f32size * 2);
+
+    let u_resolution = gl.getUniformLocation(program, 'u_resolution');
+    gl.uniform2f(u_resolution, 640, 360);
+    
+    let video1 = document.getElementById('video1');
+    let video2 = document.getElementById('video2');
+    
+    video1.oncanplaythrough = function () {
+    }
+    video2.oncanplaythrough = function () {
+        video2.oncanplaythrough = null
+        // video2.currentTime = 0.08;
+    }
+    
+    function draw() {
+        
+        requestAnimationFrame (draw);
+        // console.time('first');
+        let diff = video1.currentTime - video2.currentTime
+        if (diff !== 0) {
+            // console.log(diff);
+        }
+
+        // gl.activeTexture(gl.TEXTURE1);
+        // gl.bindTexture(gl.TEXTURE_2D, texture2);
+        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video2);
+        // gl.drawArrays(gl.TRIANGLES, 0, 6);
+        
+        // gl.activeTexture(gl.TEXTURE0);
+        // gl.bindTexture(gl.TEXTURE_2D, texture1);
+        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video1);
+        // console.timeEnd('first');
+    }
+
+    draw();
+    
+    let button = document.createElement('button');
+    button.textContent = 'play';
+    document.body.appendChild(button);
+    button.onclick = function () {
+        if (video1.paused) {
+            Promise.all([video2.play(), video1.play()])
+
+        } else {
+            video2.pause();
+            video1.pause();
+        }
+            console.log(video1.currentTime, video2.currentTime);
+    }
+
+</script>
+</html>
