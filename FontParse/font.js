@@ -3,8 +3,10 @@ let sectionWidth = section.offsetWidth;
 let text = section.textContent.trim();
 
 let fontSize = 64;
-let fontFamily = 'Parchment';
-let coeffcient = (1534 + 651) / 2048;
+// let fontFamily = 'Parchment';
+let fontFamily = 'Showcard Gothic';
+
+let coeffcient = (2119 + 416) / 2048;
 let actuallyFontSize = ~~(fontSize * coeffcient);
 
 /**
@@ -13,7 +15,19 @@ let actuallyFontSize = ~~(fontSize * coeffcient);
 let canvas = document.getElementById('canvas');
 let context = canvas.getContext('2d');
 
-function checkFont(name) {
+
+function loadFont(fontFamily, url) {
+    return new Promise((resolve, reject) => {
+        let font = new FontFace(fontFamily, `url(${url})`);
+        font.load().then(() => {
+            document.fonts.add(font);
+            resolve();  
+        }).catch(reject);
+    })
+
+}
+
+function checkAndLoadFont(name, url = '') {
     return new Promise((resolve, reject) => {
         let values = document.fonts.values();
         let isHave = false;
@@ -21,6 +35,7 @@ function checkFont(name) {
         while(!item.done && !isHave) {
             let fontFace = item.value;
             if (fontFace.family === name) {
+                isHave = true;
                 if (fontFace.status === 'loaded') {
                     resolve();
                 } else {
@@ -29,7 +44,12 @@ function checkFont(name) {
             }
             item = values.next();
         }
-        return isHave;
+
+        if (!isHave) {
+            loadFont(name, url)
+            .then(resolve)
+            .catch(reject);
+        }
     })
 }
 
@@ -91,7 +111,7 @@ function drawText(context, text) {
 
 
 }
-let bool = checkFont('Parchment').then(() => {
+let bool = checkAndLoadFont(fontFamily, '../../assets/fonts/PARCHM.TTF').then(() => {
     if (bool) {
         context.font = `${fontSize}px ${fontFamily}`;
         context.textBaseline = 'ideographic';

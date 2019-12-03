@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<style type="text/css">
+		.container {
+			perspective: 1000px;
+		}
+
+		.door {
+			transform-style: preserve-3d;
+
+			margin: 50px 100px;
+			background-color: red;
+			width: 200px;
+			height: 200px;
+			animation: rotate 2s 1;
+			animation-fill-mode: forwards;
+			transform-origin: 0 0;
+		}
+
+		@keyframes rotate {
+			from {
+				transform: rotate3d(0, 0, 0, 0deg)
+			}
+
+			to {
+				transform: rotate3d(0, 200, 0, 80deg)
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="door"></div>
+	</div>
+
+
+</body>
+
+</html>

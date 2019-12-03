@@ -12,13 +12,13 @@
     </style>
 </head>
 <body>
-    <!-- <video loop id="video1" width="640" height="360" src="http://localhost:8081/assets/Gop25_20191127143122_low.mp4" controls></video> -->
-    <video loop id="video1" width="640" height="360" src="http://localhost:8081/assets/Hi2180-loKey_20191127170610_high.mp4" controls></video>
+    <video loop id="video1" width="640" height="360" src="http://localhost:8081/assets/Gop25_20191127143122_low.mp4" controls></video>
+    <!-- <video id="video1" width="640" height="360" src="http://localhost:8081/assets/Hi2180-loKey_20191127170610_high.mp4" controls></video> -->
     <!-- <video loop id="video1" width="640" height="360" src="http://localhost:8081/mpdAssets/popcart.mp4" controls></video> -->
     
     <div>
-            <video loop id="video2" width="640" height="360" src="http://localhost:8081/assets/Hi2180-loKey_20191127170610_high.key.NewKey.mp4" controls/>
-            <!-- <video loop id="video2" width="640" height="360" src="http://localhost:8081/assets/Gop25_20191127143122_low.key.NewKey.mp4" controls/> -->
+            <!-- <video id="video2" width="640" height="360" src="http://localhost:8081/assets/Hi2180-loKey_20191127170610_high.key.NewKey.mp4" controls/> -->
+            <video loop id="video2" width="640" height="360" src="http://localhost:8081/assets/Gop25_20191127143122_low.key.NewKey.mp4" controls/>
     </div>
     
     <div style="background-image: url('http://localhost:8081/assets/icon.jpg');">
@@ -110,20 +110,22 @@
         
         requestAnimationFrame (draw);
         // console.time('first');
-        let diff = video1.currentTime - video2.currentTime
-        if (diff !== 0) {
-            // console.log(diff);
+        let diff = Math.abs(video1.currentTime - video2.currentTime);
+        let frame1 = Math.floor(video1.currentTime * 25);
+        let frame2 = Math.floor(video2.currentTime * 25);
+        let frameDiff = Math.abs(frame1 - frame2);
+        if (frameDiff !== 0) {
+            console.log(frame1, frame2);
         }
 
-        // gl.activeTexture(gl.TEXTURE1);
-        // gl.bindTexture(gl.TEXTURE_2D, texture2);
-        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video2);
-        // gl.drawArrays(gl.TRIANGLES, 0, 6);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, texture2);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video2);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
         
-        // gl.activeTexture(gl.TEXTURE0);
-        // gl.bindTexture(gl.TEXTURE_2D, texture1);
-        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video1);
-        // console.timeEnd('first');
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture1);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video1);
     }
 
     draw();
@@ -133,11 +135,18 @@
     document.body.appendChild(button);
     button.onclick = function () {
         if (video1.paused) {
-            Promise.all([video2.play(), video1.play()])
+            video1.onseeked = function () {
+                video2.play();
+                video1.play();
+                video1.onseeked = null;
+            }
+            video1.currentTime = video2.currentTime;
+            
 
         } else {
             video2.pause();
             video1.pause();
+            video1.currentTime = video2.currentTime;
         }
             console.log(video1.currentTime, video2.currentTime);
     }
