@@ -7,16 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <style>
-        @font-face {
-            font-family: 'Parchment';
-            src: url('../../assets/fonts/PARCHM.TTF');
-        }
-
-        @font-face {
-            font-family: 'Showcard Gothic';
-            src: url('../../assets/fonts/SHOWG.TTF');
-        }
-
         div {
             position: relative;
         }
@@ -38,19 +28,31 @@
         canvas {
             z-index: -1;
         }
+
+        .dashboard {
+            left: 500px;
+            top: 200px;
+        }
+
+        .flex {
+            display: flex;
+        }
     </style>
 </head>
 
 <body>
     <div>
         <p class="absolute">
-            qweradsf<br>qwera大师傅sdfasdf<br>wertwefgsdfgsdfg sdfgerwt  sdfgsdfgsdfgsdfgsdfgsdfgsdfg<br>wretwertwertwert
+            qweradsf<br>qwerasdfasdf<br>wertwefgsdfgsdfg sdfgerwt  sdfgsdfgsdfgsdfgsdfgsdfgsdfg<br>wretwertwertwert
         </p>
 
         <!-- <p class="absolute">
             Hello
         </p> -->
         <canvas id="canvas" class="absolute" width="1920" height="1080"></canvas>
+    </div>
+    <div class="dashboard absolute">
+
     </div>
 
 </body>
