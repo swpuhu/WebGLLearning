@@ -7,11 +7,26 @@ const debug = require('debug');
 
 opentype.load(filePath, function (err, font) {
     if (!err) {
-        console.log(font.names.fullName)
-        console.log(font.tables.os2);
-        console.log('unitsPerEm: ' + font.unitsPerEm);
-        console.log('ascender: ' + font.ascender);
-        console.log('descender: ' + font.descender);
+        let fullName = font.names.fullName;
+        let fontFamily = font.names.fontFamily;
+        let fontSubFamily = font.names.fontSubfamily;
+        let winAscent = font.tables.os2.usWinAscent;
+        let winDescent = font.tables.os2.usWinDescent;
+        let unitsPerEm = font.unitsPerEm;
+        let ascent = font.ascender;
+        let descent = font.descender;
+        let obj = {
+            fullName,
+            fontFamily,
+            fontSubFamily,
+            winAscent,
+            winDescent,
+            unitsPerEm,
+            ascent,
+            descent
+        }
+
+        console.log(obj);
     }
 })
 

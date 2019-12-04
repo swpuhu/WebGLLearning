@@ -1,17 +1,62 @@
+let params = {
+    'Showcard Gothic': {
+        winAscent: 2119,
+        winDescent: 416,
+        ascent: 1633,
+        descent: 415,
+        unitsPerEm: 2048
+    },
+    'Parchment': {
+        winAscent: 1534,
+        winDescent: 651,
+        ascent: 1638,
+        descent: 410,
+        unitsPerEm: 2048
+
+    }
+}
+
+
+
 let section = document.querySelector('p');
-let sectionWidth = section.offsetWidth;
+let sectionWidth = 189;
+
 let text = section.innerText;
-let lineHeight = 2.5;
-let fontSize = 80;
-// let fontFamily = 'Parchment';
-let fontFamily = 'Showcard Gothic';
+let textAlign = 'left';
+let lineHeight = 1.25;
+let fontSize = 28.8;
+// let fontFamily = 'Showcard Gothic';
+let fontFamily = 'Parchment';
+let fontStyle = 'italic';
+fontSize = Math.round(fontSize);
 
-let coeffcient = (2119 + 416) / 2048;
+
+section.style.textAlign = textAlign;
+section.style.lineHeight = lineHeight;
+section.style.fontSize = fontSize + 'px';
+section.style.fontFamily = fontFamily;
+section.style.fontStyle = fontStyle;
+section.style.width = sectionWidth + 'px';
+
+let winAscent = params[fontFamily].winAscent;
+let winDescent = params[fontFamily].winDescent;
+let ascent = params[fontFamily].ascent;
+let descent = params[fontFamily].descent;
+let unitsPerEm = params[fontFamily].unitsPerEm;
+
+let coeffcient = Math.round((winAscent + winDescent) / unitsPerEm * 100) / 100;
 let actuallyFontSize = Math.round(fontSize * coeffcient);
-let actuallyLineHeight = fontSize * lineHeight;
-let halfLineHeight = (actuallyLineHeight - actuallyFontSize) / 2.0;
-halfLineHeight = (actuallyLineHeight - fontSize) / 2;
-
+lineHeight = Math.round(fontSize * lineHeight);
+let halfLineHeight = (lineHeight - actuallyFontSize) / 2;
+let offsetY = halfLineHeight + ((winAscent - ascent) / unitsPerEm * fontSize);
+let offsetX = 0;
+if (textAlign === 'left') {
+    offsetX = 0;
+} else if (textAlign === 'center') {
+    offsetX = sectionWidth / 2;
+} else {
+    offsetX = sectionWidth;
+}
 /**
  * @type {HTMLCanvasElement}
  */
@@ -77,9 +122,7 @@ function drawText(context, text) {
     let charNumsPerLine = Math.floor(text.length / lines);
     let currentLength = charNumsPerLine;
     let currentLine = 0;
-    let offsetY = 0;
     while(cursor + currentLength <= text.length) {
-        offsetY += halfLineHeight;
         currentLength = charNumsPerLine;
         let str = text.substr(cursor, currentLength);
         if (/\n/.test(str)) {
@@ -93,7 +136,7 @@ function drawText(context, text) {
         let strWidth = context.measureText(str).width;
         while(strWidth < sectionWidth) {
             let nextChar = text[cursor + currentLength];
-            if (isBlank(nextChar) || cursor + currentLength >= text.length) break;
+            if (/\n/.test(str) || cursor + currentLength >= text.length) break;
             ++currentLength;
             str = text.substr(cursor, currentLength);
             strWidth = context.measureText(str).width;
@@ -118,33 +161,31 @@ function drawText(context, text) {
             }
         }
         cursor += currentLength;
-        // if (currentLine === 0) {
-        //     offsetY -= halfLineHeight;
-        // }
-        context.fillText(str, 0, offsetY);
-        offsetY += (halfLineHeight + actuallyFontSize);
+        let dY = currentLine * lineHeight + offsetY;
+        context.fillText(str, offsetX, dY);
         ++currentLine;
     }
     str = text.substr(cursor, currentLength);
     let remainStr = str;
     let pos = remainStr.indexOf('\n');
     while(pos > 0) {
-        offsetY += (actuallyFontSize - halfLineHeight);
+        let dY = currentLine * lineHeight + offsetY;
         str = remainStr.substr(0, pos);
-        context.fillText(str, 0, offsetY);
+        context.fillText(str, offsetX, dY);
         ++currentLine;
         remainStr = remainStr.substr(pos + 1);
         pos = remainStr.indexOf('\n');
         offsetY += halfLineHeight;
     }
-    offsetY += (actuallyFontSize - halfLineHeight);
-    context.fillText(remainStr, 0, offsetY);
+    let dY = currentLine * lineHeight + offsetY;
+    context.fillText(remainStr, offsetX, dY);
 
 
 }
 let bool = checkAndLoadFont(fontFamily, '../../assets/fonts/PARCHM.TTF').then(() => {
     if (bool) {
-        context.font = `${fontSize}px ${fontFamily}`;
+        context.font = `italic ${fontSize}px ${fontFamily}`;
+        context.textAlign = textAlign
         context.textBaseline = 'top';
         sectionWidth = section.offsetWidth;
         drawText(context, text);
