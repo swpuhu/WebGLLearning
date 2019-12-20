@@ -698,6 +698,33 @@ function createRectPoints(x, y, width, height) {
     ]);
     return [WebGL2RenderingContext.TRIANGLES, arr];
 }
+
+
+
+
+function generateTriangles(points1, points2) {
+    let ret = [];
+    for (let i = 0; i < points1.length - 2; i += 2) {
+        let point1X = points1[i];
+        let point2X = points2[i];
+        let point1Y = points1[i + 1];
+        let point2Y = points2[i + 1];
+        let nextPoint1X = points1[i + 2];
+        let nextPoint2X = points2[i + 2];
+        let nextPoint1Y = points1[i + 3];
+        let nextPoint2Y = points2[i + 3];
+        ret.push(
+            point2X, point2Y,
+            point1X, point1Y,
+            nextPoint1X, nextPoint1Y,
+            nextPoint1X, nextPoint1Y,
+            nextPoint2X, nextPoint2Y,
+            point2X, point2Y
+        );
+    }
+    return new Float32Array(ret);
+}
+
 export default {
     initWebGL,
     createProjection,
@@ -722,5 +749,6 @@ export default {
     subtractVectors,
     lookAt,
     createCirclePoints,
-    createRectPoints
+    createRectPoints,
+    generateTriangles
 }
