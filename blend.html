@@ -133,6 +133,7 @@
     let button = document.createElement('button');
     button.textContent = 'play';
     document.body.appendChild(button);
+    
     button.onclick = function () {
         if (video1.paused) {
             video1.onseeked = function () {

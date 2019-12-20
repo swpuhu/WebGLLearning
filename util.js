@@ -69,7 +69,7 @@ function createRotateMatrix(center, rotate, axis = 'z') {
         center.z = 0;
     }
     let ret;
-    switch(axis) {
+    switch (axis) {
         case 'x':
             ret = new Float32Array([
                 1.0, 0.0, 0.0, 0.0,
@@ -354,8 +354,8 @@ function rotate(center, x, y, rotate) {
 
 function pnpoly(number, verX, verY, testX, testY) {
     let i, j, c = false;
-    for(i = 0, j = number - 1; i < number; j = i++) {
-        if(((verY[i] > testY) !== (verY[j] > testY)) &&
+    for (i = 0, j = number - 1; i < number; j = i++) {
+        if (((verY[i] > testY) !== (verY[j] > testY)) &&
             (testX < (verX[j] - verX[i]) * (testY - verY[i]) / (verY[j] - verY[i]) + verX[i])) {
             c = !c;
         }
@@ -376,9 +376,9 @@ function createTriangleClipPath(canvas, progress, offsetX = 0, offsetY = 0, scal
     let distanceRU = calcDistance(centerX, centerY, canvas.width, canvas.height);
     let r = Math.max(distanceLD, distanceLU, distanceRD, distanceRU) * progress;
     let points = new Float32Array([
-         canvas.width / 2, canvas.height / 2 + 2 * r, 0.5, 0.5 + 2 * r / canvas.height,
-         canvas.width / 2 - 1.732 * r, canvas.height / 2 - r, 0.5 - 1.732 * r / canvas.width, 0.5 - r / canvas.height,
-         canvas.width / 2 + 1.732 * r, canvas.height / 2- r, 0.5 + 1.732 * r / canvas.width, 0.5 - r / canvas.height
+        canvas.width / 2, canvas.height / 2 + 2 * r, 0.5, 0.5 + 2 * r / canvas.height,
+        canvas.width / 2 - 1.732 * r, canvas.height / 2 - r, 0.5 - 1.732 * r / canvas.width, 0.5 - r / canvas.height,
+        canvas.width / 2 + 1.732 * r, canvas.height / 2 - r, 0.5 + 1.732 * r / canvas.width, 0.5 - r / canvas.height
     ]);
     for (let i = 0; i < points.length; i += 4) {
         // points[i + 2] 
@@ -429,19 +429,19 @@ function createNoiseImage(width, height, type, factor) {
 
 
 
-function createPerspective(near, far, l, r, t ,b) {    
+function createPerspective(near, far, l, r, t, b) {
     let rangeInv = 1.0 / (far - near);
 
     let n = near;
     return [
-      2 * n / (r - l), 0, 0, 0,
-      0, 2 * n / (t - b), 0, 0,
-      - (r + l) / (r - l), -(t + b) / (t - b), (near + far) * rangeInv, 1,
-      0, 0, -near * far * rangeInv * 2, 0
+        2 * n / (r - l), 0, 0, 0,
+        0, 2 * n / (t - b), 0, 0,
+        -(r + l) / (r - l), -(t + b) / (t - b), (near + far) * rangeInv, 1,
+        0, 0, -near * far * rangeInv * 2, 0
     ];
 }
 
-function createEditor (name, type = 'range', min, max, value, step = 1) {
+function createEditor(name, type = 'range', min, max, value, step = 1) {
     let obj = {};
     let oninput = null;
     let wrapper = document.createElement('div');
@@ -466,25 +466,25 @@ function createEditor (name, type = 'range', min, max, value, step = 1) {
     wrapper.appendChild(display);
     Object.defineProperties(obj, {
         oninput: {
-            set (value) {
+            set(value) {
                 oninput = value;
             },
-            get () {
+            get() {
                 return oninput;
             }
         },
         ref: {
-            get () {
+            get() {
                 return wrapper;
             }
         },
         step: {
-            set (value) {
+            set(value) {
                 input.step = value;
             }
         },
         value: {
-            get () {
+            get() {
                 return input.value;
             }
         }
@@ -528,26 +528,26 @@ function multiply(a, b) {
     var b32 = b[3 * 4 + 2];
     var b33 = b[3 * 4 + 3];
     return [
-      b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
-      b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
-      b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
-      b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33,
-      b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30,
-      b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31,
-      b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32,
-      b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33,
-      b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30,
-      b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31,
-      b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32,
-      b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33,
-      b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
-      b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
-      b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
-      b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
+        b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
+        b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31,
+        b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32,
+        b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33,
+        b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30,
+        b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31,
+        b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32,
+        b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33,
+        b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30,
+        b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31,
+        b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32,
+        b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33,
+        b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30,
+        b30 * a01 + b31 * a11 + b32 * a21 + b33 * a31,
+        b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
+        b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
     ];
-  };
+};
 
-  function inverse(m) {
+function inverse(m) {
     var m00 = m[0 * 4 + 0];
     var m01 = m[0 * 4 + 1];
     var m02 = m[0 * 4 + 2];
@@ -564,16 +564,16 @@ function multiply(a, b) {
     var m31 = m[3 * 4 + 1];
     var m32 = m[3 * 4 + 2];
     var m33 = m[3 * 4 + 3];
-    var tmp_0  = m22 * m33;
-    var tmp_1  = m32 * m23;
-    var tmp_2  = m12 * m33;
-    var tmp_3  = m32 * m13;
-    var tmp_4  = m12 * m23;
-    var tmp_5  = m22 * m13;
-    var tmp_6  = m02 * m33;
-    var tmp_7  = m32 * m03;
-    var tmp_8  = m02 * m23;
-    var tmp_9  = m22 * m03;
+    var tmp_0 = m22 * m33;
+    var tmp_1 = m32 * m23;
+    var tmp_2 = m12 * m33;
+    var tmp_3 = m32 * m13;
+    var tmp_4 = m12 * m23;
+    var tmp_5 = m22 * m13;
+    var tmp_6 = m02 * m33;
+    var tmp_7 = m32 * m03;
+    var tmp_8 = m02 * m23;
+    var tmp_9 = m22 * m03;
     var tmp_10 = m02 * m13;
     var tmp_11 = m12 * m03;
     var tmp_12 = m20 * m31;
@@ -601,76 +601,103 @@ function multiply(a, b) {
     var d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
 
     return [
-      d * t0,
-      d * t1,
-      d * t2,
-      d * t3,
-      d * ((tmp_1 * m10 + tmp_2 * m20 + tmp_5 * m30) -
+        d * t0,
+        d * t1,
+        d * t2,
+        d * t3,
+        d * ((tmp_1 * m10 + tmp_2 * m20 + tmp_5 * m30) -
             (tmp_0 * m10 + tmp_3 * m20 + tmp_4 * m30)),
-      d * ((tmp_0 * m00 + tmp_7 * m20 + tmp_8 * m30) -
+        d * ((tmp_0 * m00 + tmp_7 * m20 + tmp_8 * m30) -
             (tmp_1 * m00 + tmp_6 * m20 + tmp_9 * m30)),
-      d * ((tmp_3 * m00 + tmp_6 * m10 + tmp_11 * m30) -
+        d * ((tmp_3 * m00 + tmp_6 * m10 + tmp_11 * m30) -
             (tmp_2 * m00 + tmp_7 * m10 + tmp_10 * m30)),
-      d * ((tmp_4 * m00 + tmp_9 * m10 + tmp_10 * m20) -
+        d * ((tmp_4 * m00 + tmp_9 * m10 + tmp_10 * m20) -
             (tmp_5 * m00 + tmp_8 * m10 + tmp_11 * m20)),
-      d * ((tmp_12 * m13 + tmp_15 * m23 + tmp_16 * m33) -
+        d * ((tmp_12 * m13 + tmp_15 * m23 + tmp_16 * m33) -
             (tmp_13 * m13 + tmp_14 * m23 + tmp_17 * m33)),
-      d * ((tmp_13 * m03 + tmp_18 * m23 + tmp_21 * m33) -
+        d * ((tmp_13 * m03 + tmp_18 * m23 + tmp_21 * m33) -
             (tmp_12 * m03 + tmp_19 * m23 + tmp_20 * m33)),
-      d * ((tmp_14 * m03 + tmp_19 * m13 + tmp_22 * m33) -
+        d * ((tmp_14 * m03 + tmp_19 * m13 + tmp_22 * m33) -
             (tmp_15 * m03 + tmp_18 * m13 + tmp_23 * m33)),
-      d * ((tmp_17 * m03 + tmp_20 * m13 + tmp_23 * m23) -
+        d * ((tmp_17 * m03 + tmp_20 * m13 + tmp_23 * m23) -
             (tmp_16 * m03 + tmp_21 * m13 + tmp_22 * m23)),
-      d * ((tmp_14 * m22 + tmp_17 * m32 + tmp_13 * m12) -
+        d * ((tmp_14 * m22 + tmp_17 * m32 + tmp_13 * m12) -
             (tmp_16 * m32 + tmp_12 * m12 + tmp_15 * m22)),
-      d * ((tmp_20 * m32 + tmp_12 * m02 + tmp_19 * m22) -
+        d * ((tmp_20 * m32 + tmp_12 * m02 + tmp_19 * m22) -
             (tmp_18 * m22 + tmp_21 * m32 + tmp_13 * m02)),
-      d * ((tmp_18 * m12 + tmp_23 * m32 + tmp_15 * m02) -
+        d * ((tmp_18 * m12 + tmp_23 * m32 + tmp_15 * m02) -
             (tmp_22 * m32 + tmp_14 * m02 + tmp_19 * m12)),
-      d * ((tmp_22 * m22 + tmp_16 * m02 + tmp_21 * m12) -
+        d * ((tmp_22 * m22 + tmp_16 * m02 + tmp_21 * m12) -
             (tmp_20 * m12 + tmp_23 * m22 + tmp_17 * m02))
     ];
-  };
+};
 
 
-  function cross(a, b) {
+function cross(a, b) {
     return [a[1] * b[2] - a[2] * b[1],
-            a[2] * b[0] - a[0] * b[2],
-            a[0] * b[1] - a[1] * b[0]];
-  };
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    ];
+};
 
-  function subtractVectors(a, b) {
+function subtractVectors(a, b) {
     return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-  }
+}
 
 
-  function normalize(v) {
+function normalize(v) {
     var length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     // 确定不会除以 0
     if (length > 0.00001) {
-      return [v[0] / length, v[1] / length, v[2] / length];
+        return [v[0] / length, v[1] / length, v[2] / length];
     } else {
-      return [0, 0, 0];
+        return [0, 0, 0];
     }
-  }
-  
-  function lookAt (cameraPosition, target, up) {
+}
+
+function lookAt(cameraPosition, target, up) {
     var zAxis = normalize(
         subtractVectors(target, cameraPosition));
     var xAxis = normalize(cross(up, zAxis));
     var yAxis = normalize(cross(zAxis, xAxis));
- 
-    return [
-       xAxis[0], xAxis[1], xAxis[2], 0,
-       yAxis[0], yAxis[1], yAxis[2], 0,
-       zAxis[0], zAxis[1], zAxis[2], 0,
-       cameraPosition[0],
-       cameraPosition[1],
-       cameraPosition[2],
-       1,
-    ];
-  }
 
+    return [
+        xAxis[0], xAxis[1], xAxis[2], 0,
+        yAxis[0], yAxis[1], yAxis[2], 0,
+        zAxis[0], zAxis[1], zAxis[2], 0,
+        cameraPosition[0],
+        cameraPosition[1],
+        cameraPosition[2],
+        1,
+    ];
+}
+
+function createCirclePoints(centerX, centerY, radius, precision = 1) {
+    let step = Math.floor(360 / precision);
+    let arr = [];
+    arr.push(centerX, centerY);
+    for (let i = 0; i < 360; i += precision) {
+        let cos = centerX + radius * Math.cos(i * Math.PI / 180);
+        let sin = centerY + radius * Math.sin(i * Math.PI / 180);
+        arr.push(cos, sin);
+    }
+    arr.push(centerX + radius * Math.cos(360 * Math.PI / 180), centerY + radius * Math.sin(360 * Math.PI / 180));
+    arr = new Float32Array(arr);
+    return [WebGL2RenderingContext.TRIANGLE_FAN, arr];
+}
+
+
+function createRectPoints(x, y, width, height) {
+    let arr = new Float32Array([
+        x, y,
+        x + width, y,
+        x + width, y + height,
+        x + width, y + height,
+        x, y + height,
+        x, y
+    ]);
+    return [WebGL2RenderingContext.TRIANGLES, arr];
+}
 export default {
     initWebGL,
     createProjection,
@@ -693,5 +720,7 @@ export default {
     multiply,
     cross,
     subtractVectors,
-    lookAt
+    lookAt,
+    createCirclePoints,
+    createRectPoints
 }
