@@ -45,7 +45,7 @@ let points = new Float32Array([
 ]);
 let baseLine = [];
 let randomLine = [];
-for (let i = 0; i < width * 200; i += 1) {
+for (let i = 0; i < width * 2000; i += 1) {
     baseLine.push(i, 0);
     randomLine.push(i, Math.random() * height);
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script src="./test.js"></script>
+<script>
+    setTimeout(() => {
+        let address;
+        function rotate(x, y, angle) {
+            address = Module._rotate(x, y, angle);
+            return [Module.HEAPF64[address / 8], Module.HEAPF64[address / 8 + 1]];
+        }
+
+
+        function jsRotate(x, y, angle) {
+            let rad = angle * Math.PI / 180.0;
+            let cos = Math.cos(rad);
+            let sin = Math.sin(rad);
+            return [x * cos - y * sin, x * sin + y * cos];
+        }
+
+
+        console.log(Module.HEAPF64.length);
+        let startTime, endTime;
+        startTime = performance.now();
+        let count = 10;
+        for (let i = 0; i < count; i++) {
+            let ret = rotate(i, i, i);
+            console.log(ret);
+        }
+        endTime = performance.now();
+        console.log('assembly rotate function spend time: ' + (endTime - startTime));
+
+
+        startTime = performance.now();
+        for (let i = 0; i < count; i++) {
+            let ret = jsRotate(i, i, i);
+            console.log(ret);
+        }
+        endTime = performance.now();
+        console.log('js rotate function spend time: ' + (endTime - startTime));
+    }, 1000);
+</script>
+
+</html>
