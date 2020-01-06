@@ -53,7 +53,7 @@ let far = 1000;
 
 let line = [];
 let r = left / 2;
-for (let a = 90; a <= 270; a += 10) {
+for (let a = 90; a <= 270; a += 20) {
     let cos = r * Math.cos(a * Math.PI / 180);
     let sin = r * Math.sin(a * Math.PI / 180);
     line.push(cos, sin, far / 2, 1);
@@ -135,11 +135,12 @@ gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
 
 let rotateX = 0;
 let rotateY = 0
-let rotateStep = 0.5;
+let rotateXStep = 0.5;
+let rotateYStep = 1.0;
 function animate () {
     requestAnimationFrame(animate);
-    rotateX += rotateStep;
-    rotateY += rotateStep;
+    rotateX += rotateXStep;
+    rotateY += rotateYStep;
     uniforms.u_rotateX = util.createRotateMatrix({ y: 0, z: far / 2 }, rotateX, 'x');
     uniforms.u_rotateY = util.createRotateMatrix({ x: 0, z: far / 2 }, rotateY, 'y');
     util.setUniforms(uniformSetters, uniforms);
