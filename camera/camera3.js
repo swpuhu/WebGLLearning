@@ -159,8 +159,12 @@ let normals = new Float32Array([
     0, -1, 0,
 ]);
 const f32size = Float32Array.BYTES_PER_ELEMENT;
-
+window.gl = gl;
 let program = util.initWebGL(gl, shader.vertexShader, shader.fragmentShader);
+window.program = program;
+let a = gl.getContextAttributes(program);
+
+console.log(a);
 gl.useProgram(program);
 
 let buffer = gl.createBuffer();
@@ -183,14 +187,14 @@ gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
 
 const a_normal = gl.getAttribLocation(program, 'a_normal');
 gl.enableVertexAttribArray(a_normal);
-gl.vertexAttribPointer(a_normal, 3, gl.FLOAT, false, f32size * 3 , 0);
+gl.vertexAttribPointer(a_normal, 3, gl.FLOAT, false, f32size * 3, 0);
 
 
 const uniforms = {
     u_perspective: util.createPerspective(200, 2000, -canvas.width / 2, canvas.width / 2, canvas.height / 2, -canvas.height / 2),
-    u_rotateX: util.createRotateMatrix({x: 0, y: 0, z: 350}, 0, 'x'),
-    u_rotateY: util.createRotateMatrix({x: 0, y: 0, z: 350}, 30, 'y'),
-    u_rotateZ: util.createRotateMatrix({x: 0, y: 0, z: 350}, 0, 'z'),
+    u_rotateX: util.createRotateMatrix({ x: 0, y: 0, z: 350 }, 0, 'x'),
+    u_rotateY: util.createRotateMatrix({ x: 0, y: 0, z: 350 }, 30, 'y'),
+    u_rotateZ: util.createRotateMatrix({ x: 0, y: 0, z: 350 }, 0, 'z'),
     u_translate: util.createTranslateMatrix(0, 0, 0)
 }
 

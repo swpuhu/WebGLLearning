@@ -4,7 +4,7 @@
  * @param {string} type 
  * @param {string} source 
  */
-function createShader(gl, type, source) {
+function createShader (gl, type, source) {
     let shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -22,7 +22,7 @@ function createShader(gl, type, source) {
  * @param {WebGLShader} vertexShader 
  * @param {WebGLShader} fragmentShader 
  */
-function createProgram(gl, vertexShader, fragmentShader) {
+function createProgram (gl, vertexShader, fragmentShader) {
     let program = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
@@ -41,14 +41,14 @@ function createProgram(gl, vertexShader, fragmentShader) {
  * @param {string} vertexSource 
  * @param {string} fragmentSource 
  */
-function initWebGL(gl, vertexSource, fragmentSource) {
+function initWebGL (gl, vertexSource, fragmentSource) {
     let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
     let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
     let program = createProgram(gl, vertexShader, fragmentShader);
     return program;
 }
 
-function createProjection(width, height, depth) {
+function createProjection (width, height, depth) {
     return [
         2 / width, 0, 0, 0,
         0, 2 / height, 0, 0,
@@ -62,7 +62,7 @@ function createProjection(width, height, depth) {
  * @param {Object} center
  * @param {Number} rotate
  */
-function createRotateMatrix(center, rotate, axis = 'z') {
+function createRotateMatrix (center, rotate, axis = 'z') {
     let cos = Math.cos(rotate * Math.PI / 180);
     let sin = Math.sin(rotate * Math.PI / 180);
     if (!center.z) {
@@ -102,7 +102,7 @@ function createRotateMatrix(center, rotate, axis = 'z') {
  * @param {Number} tx
  * @param {Number} ty
  */
-function createTranslateMatrix(tx = 0, ty = 0, tz = 0) {
+function createTranslateMatrix (tx = 0, ty = 0, tz = 0) {
     return new Float32Array([
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
@@ -117,7 +117,7 @@ function createTranslateMatrix(tx = 0, ty = 0, tz = 0) {
  * @param {Number} scaleY
  * @param {Number} scaleZ
  */
-function createScaleMatrix(scaleX, scaleY, scaleZ, center = {
+function createScaleMatrix (scaleX, scaleY, scaleZ, center = {
     x: 0,
     y: 0,
     z: 0
@@ -134,7 +134,7 @@ function createScaleMatrix(scaleX, scaleY, scaleZ, center = {
  * @desc 对比度矩阵
  * @param {Number} value
  */
-function createContrastMatrix(value) {
+function createContrastMatrix (value) {
     return new Float32Array([
         value, 0.0, 0.0, 0.0,
         0.0, value, 0.0, 0.0,
@@ -148,7 +148,7 @@ function createContrastMatrix(value) {
  * @desc 色相旋转矩阵
  * @param {Number} value
  */
-function createHueRotateMatrix(value) {
+function createHueRotateMatrix (value) {
     let sin = Math.sin(value * Math.PI / 180);
     let cos = Math.cos(value * Math.PI / 180);
     return new Float32Array([
@@ -163,7 +163,7 @@ function createHueRotateMatrix(value) {
  * @desc 饱和度矩阵
  * @param {Number} value
  */
-function createSaturateMatrix(value) {
+function createSaturateMatrix (value) {
     return new Float32Array([
         0.3086 * (1 - value) + value, 0.3086 * (1 - value), 0.3086 * (1 - value), 0.0,
         0.6094 * (1 - value), 0.6094 * (1 - value) + value, 0.6094 * (1 - value), 0.0,
@@ -181,7 +181,7 @@ function createSaturateMatrix(value) {
  * @param {Number} endArc 终止圆弧半径
  * @param {Boolean} clockwise 方向，默认顺时针
  */
-function createArcVertex(gl, x, y, radius, startArc, endArc, isInverse = false) {
+function createArcVertex (gl, x, y, radius, startArc, endArc, isInverse = false) {
     let precision = 1;
     let oneArc = Math.PI / 180
     let points = [x, y, x / gl.canvas.width, y / gl.canvas.height];
@@ -208,7 +208,7 @@ function createArcVertex(gl, x, y, radius, startArc, endArc, isInverse = false) 
  *
  * @param {WebGLRenderingContext} gl
  */
-function createTexture(gl) {
+function createTexture (gl) {
     let texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -219,7 +219,7 @@ function createTexture(gl) {
     return texture;
 }
 
-function computeKernalWeight(kernal) {
+function computeKernalWeight (kernal) {
     let weight = kernal.reduce((prev, cur) => {
         return prev + cur;
     }, 0);
@@ -233,7 +233,7 @@ function computeKernalWeight(kernal) {
  * @param {Array} vertX
  * @param {Array} vertY
  */
-function checkPointIn(x, y, vertX, vertY) {
+function checkPointIn (x, y, vertX, vertY) {
     let minX = Math.min(...vertX);
     let minY = Math.min(...vertY);
     let maxX = Math.max(...vertX);
@@ -260,7 +260,7 @@ function checkPointIn(x, y, vertX, vertY) {
  * @param {Array} vertX
  * @param {Array} vertY
  */
-function checkPointIn2(x, y, vertX, vertY) {
+function checkPointIn2 (x, y, vertX, vertY) {
     let minX = Math.min(...vertX);
     let minY = Math.min(...vertY);
     let maxX = Math.max(...vertX);
@@ -285,7 +285,7 @@ function checkPointIn2(x, y, vertX, vertY) {
  *
  * @param {String} hex
  */
-function hexToRGB(hex) {
+function hexToRGB (hex) {
     if (/#[a-f0-9]{6}/i.test(hex)) {
         let r = +('0x' + hex.substr(1, 2));
         let g = +('0x' + hex.substr(3, 2));
@@ -294,7 +294,7 @@ function hexToRGB(hex) {
     }
 }
 
-function generateImageByDiv(width, height, html) {
+function generateImageByDiv (width, height, html) {
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -332,7 +332,7 @@ function generateImageByDiv(width, height, html) {
  * @param {number} _bottom 
  * @param {number} _top 
  */
-function createClipPath(canvas, left = 0, right = 0, _bottom = 0, _top = 0, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
+function createClipPath (canvas, left = 0, right = 0, _bottom = 0, _top = 0, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
     return new Float32Array([
         0 + canvas.width * left, 0 + canvas.height * _top, left, _top,
         canvas.width - canvas.width * right, 0 + canvas.height * _top, 1 - right, _top,
@@ -343,7 +343,7 @@ function createClipPath(canvas, left = 0, right = 0, _bottom = 0, _top = 0, offs
     ])
 }
 
-function rotate(center, x, y, rotate) {
+function rotate (center, x, y, rotate) {
     let cos = Math.cos(rotate * Math.PI / 180);
     let sin = Math.sin(rotate * Math.PI / 180);
     return [
@@ -352,7 +352,7 @@ function rotate(center, x, y, rotate) {
     ]
 }
 
-function pnpoly(number, verX, verY, testX, testY) {
+function pnpoly (number, verX, verY, testX, testY) {
     let i, j, c = false;
     for (i = 0, j = number - 1; i < number; j = i++) {
         if (((verY[i] > testY) !== (verY[j] > testY)) &&
@@ -363,11 +363,11 @@ function pnpoly(number, verX, verY, testX, testY) {
     return c;
 }
 
-function calcDistance(x1, y1, x2, y2) {
+function calcDistance (x1, y1, x2, y2) {
     return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 }
 
-function createTriangleClipPath(canvas, progress, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
+function createTriangleClipPath (canvas, progress, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
     let centerX = canvas.width / 2 + offsetX * canvas.width;
     let centerY = canvas.height / 2 + offsetY * canvas.height;
     let distanceLD = calcDistance(centerX, centerY, 0, 0);
@@ -390,7 +390,7 @@ function createTriangleClipPath(canvas, progress, offsetX = 0, offsetY = 0, scal
 
 
 
-function createNoiseImage(width, height, type, factor) {
+function createNoiseImage (width, height, type, factor) {
     let data;
     switch (type) {
         case WebGLRenderingContext.RGBA:
@@ -429,7 +429,7 @@ function createNoiseImage(width, height, type, factor) {
 
 
 
-function createPerspective(near, far, l, r, t, b) {
+function createPerspective (near, far, l, r, t, b) {
     let rangeInv = 1.0 / (far - near);
 
     let n = near;
@@ -441,7 +441,7 @@ function createPerspective(near, far, l, r, t, b) {
     ];
 }
 
-function createEditor(name, type = 'range', min, max, value, step = 1) {
+function createEditor (name, type = 'range', min, max, value, step = 1) {
     let obj = {};
     let oninput = null;
     let wrapper = document.createElement('div');
@@ -466,25 +466,25 @@ function createEditor(name, type = 'range', min, max, value, step = 1) {
     wrapper.appendChild(display);
     Object.defineProperties(obj, {
         oninput: {
-            set(value) {
+            set (value) {
                 oninput = value;
             },
-            get() {
+            get () {
                 return oninput;
             }
         },
         ref: {
-            get() {
+            get () {
                 return wrapper;
             }
         },
         step: {
-            set(value) {
+            set (value) {
                 input.step = value;
             }
         },
         value: {
-            get() {
+            get () {
                 return input.value;
             }
         }
@@ -492,9 +492,19 @@ function createEditor(name, type = 'range', min, max, value, step = 1) {
     return obj;
 }
 
+function MatMultiVec (v, m) {
+    var dst = [];
+    for (var i = 0; i < 4; ++i) {
+        dst[i] = 0.0;
+        for (var j = 0; j < 4; ++j) {
+            dst[i] += v[j] * m[j * 4 + i];
+        }
+    }
+    return dst;
+}
 
 
-function multiply(a, b) {
+function multiply (a, b) {
     var a00 = a[0 * 4 + 0];
     var a01 = a[0 * 4 + 1];
     var a02 = a[0 * 4 + 2];
@@ -547,7 +557,7 @@ function multiply(a, b) {
     ];
 };
 
-function inverse(m) {
+function inverse (m) {
     var m00 = m[0 * 4 + 0];
     var m01 = m[0 * 4 + 1];
     var m02 = m[0 * 4 + 2];
@@ -633,19 +643,19 @@ function inverse(m) {
 };
 
 
-function cross(a, b) {
+function cross (a, b) {
     return [a[1] * b[2] - a[2] * b[1],
-        a[2] * b[0] - a[0] * b[2],
-        a[0] * b[1] - a[1] * b[0]
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0]
     ];
 };
 
-function subtractVectors(a, b) {
+function subtractVectors (a, b) {
     return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 }
 
 
-function normalize(v) {
+function normalize (v) {
     var length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     // 确定不会除以 0
     if (length > 0.00001) {
@@ -655,7 +665,7 @@ function normalize(v) {
     }
 }
 
-function lookAt(cameraPosition, target, up) {
+function lookAt (cameraPosition, target, up) {
     var zAxis = normalize(
         subtractVectors(target, cameraPosition));
     var xAxis = normalize(cross(up, zAxis));
@@ -672,7 +682,7 @@ function lookAt(cameraPosition, target, up) {
     ];
 }
 
-function createCirclePoints(centerX, centerY, radius, precision = 1) {
+function createCirclePoints (centerX, centerY, radius, precision = 1) {
     let step = Math.floor(360 / precision);
     let arr = [];
     arr.push(centerX, centerY);
@@ -687,7 +697,7 @@ function createCirclePoints(centerX, centerY, radius, precision = 1) {
 }
 
 
-function createRectPoints(x, y, width, height) {
+function createRectPoints (x, y, width, height) {
     let arr = new Float32Array([
         x, y,
         x + width, y,
@@ -702,7 +712,7 @@ function createRectPoints(x, y, width, height) {
 
 
 
-function generateTriangles(points1, points2) {
+function generateTriangles (points1, points2) {
     let ret = [];
     for (let i = 0; i < points1.length - 2; i += 2) {
         let point1X = points1[i];
@@ -725,6 +735,239 @@ function generateTriangles(points1, points2) {
     return new Float32Array(ret);
 }
 
+
+function generateTrianglesByLines (lines) {
+    if (lines.length < 2) throw new Error('lines nums must be more than 1');
+    let _lines = [...lines];
+    let ret = [];
+    let baseLine = _lines.shift();
+    while (_lines.length) {
+        let line = _lines.shift();
+        let points1 = baseLine;
+        let points2 = line;
+        for (let i = 0; i < points1.length - 4; i += 4) {
+            let point1X = points1[i];
+            let point2X = points2[i];
+            let point1Y = points1[i + 1];
+            let point2Y = points2[i + 1];
+            let point1Z = points1[i + 2];
+            let point2Z = points2[i + 2];
+            let nextPoint1X = points1[i + 4];
+            let nextPoint2X = points2[i + 4];
+            let nextPoint1Y = points1[i + 5];
+            let nextPoint2Y = points2[i + 5];
+            let nextPoint1Z = points1[i + 6];
+            let nextPoint2Z = points2[i + 6];
+            ret.push(
+                point2X, point2Y, point2Z, 1,
+                point1X, point1Y, point1Z, 1,
+                nextPoint1X, nextPoint1Y, nextPoint1Z, 1,
+                nextPoint1X, nextPoint1Y, nextPoint1Z, 1,
+                nextPoint2X, nextPoint2Y, nextPoint2Z, 1,
+                point2X, point2Y, point2Z, 1
+            );
+        }
+        baseLine = line;
+    }
+
+    return ret;
+}
+
+
+function createUniformSetters (gl, program) {
+    let textureUnit = 0;
+
+    /**
+     * Creates a setter for a uniform of the given program with it's
+     * location embedded in the setter.
+     * @param {WebGLProgram} program
+     * @param {WebGLUniformInfo} uniformInfo
+     * @returns {function} the created setter.
+     */
+    function createUniformSetter (program, uniformInfo) {
+        const location = gl.getUniformLocation(program, uniformInfo.name);
+        const type = uniformInfo.type;
+        // Check if this uniform is an array
+        const isArray = (uniformInfo.size > 1 && uniformInfo.name.substr(-3) === '[0]');
+        if (type === gl.FLOAT && isArray) {
+            return function (v) {
+                gl.uniform1fv(location, v);
+            };
+        }
+        if (type === gl.FLOAT) {
+            return function (v) {
+                gl.uniform1f(location, v);
+            };
+        }
+        if (type === gl.FLOAT_VEC2) {
+            return function (v) {
+                gl.uniform2fv(location, v);
+            };
+        }
+        if (type === gl.FLOAT_VEC3) {
+            return function (v) {
+                gl.uniform3fv(location, v);
+            };
+        }
+        if (type === gl.FLOAT_VEC4) {
+            return function (v) {
+                gl.uniform4fv(location, v);
+            };
+        }
+        if (type === gl.INT && isArray) {
+            return function (v) {
+                gl.uniform1iv(location, v);
+            };
+        }
+        if (type === gl.INT) {
+            return function (v) {
+                gl.uniform1i(location, v);
+            };
+        }
+        if (type === gl.INT_VEC2) {
+            return function (v) {
+                gl.uniform2iv(location, v);
+            };
+        }
+        if (type === gl.INT_VEC3) {
+            return function (v) {
+                gl.uniform3iv(location, v);
+            };
+        }
+        if (type === gl.INT_VEC4) {
+            return function (v) {
+                gl.uniform4iv(location, v);
+            };
+        }
+        if (type === gl.BOOL) {
+            return function (v) {
+                gl.uniform1iv(location, v);
+            };
+        }
+        if (type === gl.BOOL_VEC2) {
+            return function (v) {
+                gl.uniform2iv(location, v);
+            };
+        }
+        if (type === gl.BOOL_VEC3) {
+            return function (v) {
+                gl.uniform3iv(location, v);
+            };
+        }
+        if (type === gl.BOOL_VEC4) {
+            return function (v) {
+                gl.uniform4iv(location, v);
+            };
+        }
+        if (type === gl.FLOAT_MAT2) {
+            return function (v) {
+                gl.uniformMatrix2fv(location, false, v);
+            };
+        }
+        if (type === gl.FLOAT_MAT3) {
+            return function (v) {
+                gl.uniformMatrix3fv(location, false, v);
+            };
+        }
+        if (type === gl.FLOAT_MAT4) {
+            return function (v) {
+                gl.uniformMatrix4fv(location, false, v);
+            };
+        }
+        if ((type === gl.SAMPLER_2D || type === gl.SAMPLER_CUBE) && isArray) {
+            const units = [];
+            for (let ii = 0; ii < info.size; ++ii) {
+                units.push(textureUnit++);
+            }
+            return function (bindPoint, units) {
+                return function (textures) {
+                    gl.uniform1iv(location, units);
+                    textures.forEach(function (texture, index) {
+                        gl.activeTexture(gl.TEXTURE0 + units[index]);
+                        gl.bindTexture(bindPoint, texture);
+                    });
+                };
+            }(getBindPointForSamplerType(gl, type), units);
+        }
+        if (type === gl.SAMPLER_2D || type === gl.SAMPLER_CUBE) {
+            return function (bindPoint, unit) {
+                return function (texture) {
+                    gl.uniform1i(location, unit);
+                    gl.activeTexture(gl.TEXTURE0 + unit);
+                    gl.bindTexture(bindPoint, texture);
+                };
+            }(getBindPointForSamplerType(gl, type), textureUnit++);
+        }
+        throw ('unknown type: 0x' + type.toString(16)); // we should never get here.
+    }
+
+    const uniformSetters = {};
+    const numUniforms = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+
+    for (let ii = 0; ii < numUniforms; ++ii) {
+        const uniformInfo = gl.getActiveUniform(program, ii);
+        if (!uniformInfo) {
+            break;
+        }
+        let name = uniformInfo.name;
+        // remove the array suffix.
+        if (name.substr(-3) === '[0]') {
+            name = name.substr(0, name.length - 3);
+        }
+        const setter = createUniformSetter(program, uniformInfo);
+        uniformSetters[name] = setter;
+    }
+    return uniformSetters;
+}
+
+
+function createAttributeSetters (gl, program) {
+    const attribSetters = {
+    };
+
+    function createAttribSetter (index) {
+        return function (b) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, b.buffer);
+            gl.enableVertexAttribArray(index);
+            gl.vertexAttribPointer(
+                index, b.numComponents || b.size, b.type || gl.FLOAT, b.normalize || false, b.stride || 0, b.offset || 0);
+        };
+    }
+
+    const numAttribs = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+    for (let ii = 0; ii < numAttribs; ++ii) {
+        const attribInfo = gl.getActiveAttrib(program, ii);
+        if (!attribInfo) {
+            break;
+        }
+        const index = gl.getAttribLocation(program, attribInfo.name);
+        attribSetters[attribInfo.name] = createAttribSetter(index);
+    }
+
+    return attribSetters;
+}
+
+
+function setUniforms (setters, values) {
+    setters = setters.uniformSetters || setters;
+    Object.keys(values).forEach(function (name) {
+        const setter = setters[name];
+        if (setter) {
+            setter(values[name]);
+        }
+    });
+}
+
+function setAttributes (setters, attribs) {
+    setters = setters.attribSetters || setters;
+    Object.keys(attribs).forEach(function (name) {
+        const setter = setters[name];
+        if (setter) {
+            setter(attribs[name]);
+        }
+    });
+}
+
 export default {
     initWebGL,
     createProjection,
@@ -744,11 +987,17 @@ export default {
     pnpoly,
     createEditor,
     inverse,
+    MatMultiVec,
     multiply,
     cross,
     subtractVectors,
     lookAt,
     createCirclePoints,
     createRectPoints,
-    generateTriangles
+    generateTriangles,
+    createUniformSetters,
+    createAttributeSetters,
+    setUniforms,
+    setAttributes,
+    generateTrianglesByLines
 }

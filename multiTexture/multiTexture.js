@@ -222,6 +222,7 @@ gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 gl.bindTexture(gl.TEXTURE_2D, null);
 
 function blendLayer(_textures = textures) {
+    requestAnimationFrame(blendLayer);
     gl.clear(gl.COLOR_BUFFER_BIT);
     if (!_textures.length) return;
     if (_textures.length === 1) {
@@ -271,6 +272,7 @@ function blendLayer(_textures = textures) {
     
     }
 }
+requestAnimationFrame(blendLayer)
 
 window.blendLayer = blendLayer;
 // blendLayer();
