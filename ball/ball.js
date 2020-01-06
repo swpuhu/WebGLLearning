@@ -14,10 +14,11 @@ const vertexShader = `
     varying vec4 v_color;
     uniform mat4 u_world;
     uniform mat4 u_camera;
-    
+    uniform mat4 u_rotateX;
+    uniform mat4 u_rotateY;
     // uniform vec4 u_camera;
     void main () {
-        gl_Position = u_world * u_camera * a_position;
+        gl_Position = u_world * u_camera * u_rotateX * u_rotateY * a_position;
         v_color = a_color;
     }
 `
@@ -49,9 +50,6 @@ let bottom = -180;
 let near = 100;
 let far = 1000;
 
-let uniforms = {
-    u_world: util.createPerspective(near, far, left, right, top, bottom)
-}
 
 let line = [];
 let r = left / 2;
@@ -60,15 +58,9 @@ for (let a = 90; a <= 270; a += 10) {
     let sin = r * Math.sin(a * Math.PI / 180);
     line.push(cos, sin, far / 2, 1);
 }
-// let line = [
-//     0, 0, far / 2, 1,
-//     left / 2, 0, far / 2, 1,
-//     left / 2, top / 2, far / 2, 1,
-//     0, top / 2, far / 2, 1
-// ]
 
 let lines = [line];
-let steps = 50;
+let steps = 20;
 for (let i = 1; i < steps; i++) {
     let rotateMatrix = util.createRotateMatrix({ x: 0, z: far / 2 }, (360 / (steps - 1)) * i, 'y');
     let newLine = [];
@@ -96,7 +88,6 @@ for (let i = 0; i < points.length; i += 24) {
     colors.push(...optionColors[count % 2]);
     colors.push(...optionColors[count % 2]);
     count++;
-
 }
 
 colors = new Float32Array(colors);
@@ -107,29 +98,52 @@ let pointsBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, pointsBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
 
-let a_position = gl.getAttribLocation(program, 'a_position');
-gl.enableVertexAttribArray(a_position);
-gl.vertexAttribPointer(a_position, 4, gl.FLOAT, false, f32size * 4, 0);
-
 
 let colorBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
 
-let a_color = gl.getAttribLocation(program, 'a_color');
-gl.enableVertexAttribArray(a_color);
-gl.vertexAttribPointer(a_color, 4, gl.FLOAT, false, f32size * 4, 0);
-
-
-
-let u_world = gl.getUniformLocation(program, 'u_world');
-let worldMat = util.createPerspective(near, far, left, right, top, bottom)
-gl.uniformMatrix4fv(u_world, false, worldMat);
-
-let u_camera = gl.getUniformLocation(program, 'u_camera');
 let cameraPos = [0, top / 4, near + 100];
 let cameraMat = util.lookAt(cameraPos, [0, 0, far / 2], [0, 1, 0]);
 cameraMat = util.inverse(cameraMat);
-gl.uniformMatrix4fv(u_camera, false, cameraMat);
 
-gl.drawArrays(gl.TRIANGLES, 0, points.length / 4)
+
+
+let uniforms = {
+    u_world: util.createPerspective(near, far, left, right, top, bottom),
+    u_camera: cameraMat,
+    u_rotateX: util.createRotateMatrix({ y: 0, z: far / 2 }, 0, 'x'),
+    u_rotateY: util.createRotateMatrix({ x: 0, z: far / 2 }, 0, 'y')
+}
+
+let attribs = {
+    a_position: {
+        buffer: pointsBuffer,
+        numComponents: 4
+    },
+    a_color: {
+        buffer: colorBuffer,
+        numComponents: 4
+    }
+}
+
+util.setAttributes(attributeSetters, attribs);
+util.setUniforms(uniformSetters, uniforms);
+
+
+gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
+
+let rotateX = 0;
+let rotateY = 0
+let rotateStep = 0.5;
+function animate () {
+    requestAnimationFrame(animate);
+    rotateX += rotateStep;
+    rotateY += rotateStep;
+    uniforms.u_rotateX = util.createRotateMatrix({ y: 0, z: far / 2 }, rotateX, 'x');
+    uniforms.u_rotateY = util.createRotateMatrix({ x: 0, z: far / 2 }, rotateY, 'y');
+    util.setUniforms(uniformSetters, uniforms);
+    gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
+}
+
+animate();
