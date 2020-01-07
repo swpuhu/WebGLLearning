@@ -736,8 +736,9 @@ function generateTriangles (points1, points2) {
 }
 
 
-function generateTrianglesByLines (lines) {
+function generateTrianglesByLines (lines, needNormals) {
     if (lines.length < 2) throw new Error('lines nums must be more than 1');
+    let normals = [];
     let _lines = [...lines];
     let ret = [];
     let baseLine = _lines.shift();
@@ -766,11 +767,22 @@ function generateTrianglesByLines (lines) {
                 point2X, point2Y, point2Z, 1,
                 nextPoint2X, nextPoint2Y, nextPoint2Z, 1,
             );
+            if (needNormals) {
+                let vec1 = [nextPoint1X - point2X, nextPoint1Y - point2Y, nextPoint1Z - point2Z];
+                let vec2 = [point1X - nextPoint1X, point1Y - nextPoint1Y, point1Z - nextPoint1Z];
+                let normal = cross(vec1, vec2);
+                normals.push(
+                    ...normal, ...normal, ...normal, ...normal, ...normal, ...normal
+                )
+            }
         }
         baseLine = line;
     }
-
-    return ret;
+    if(needNormals) {
+        return [ret, normals];
+    } else {
+        return ret;
+    }
 }
 
 
