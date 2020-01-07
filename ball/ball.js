@@ -38,7 +38,7 @@ let gl = canvas.getContext('webgl');
 let program = util.initWebGL(gl, vertexShader, fragmentShader);
 gl.useProgram(program);
 gl.enable(gl.DEPTH_TEST);
-
+gl.enable(gl.CULL_FACE);
 let uniformSetters = util.createUniformSetters(gl, program);
 let attributeSetters = util.createAttributeSetters(gl, program);
 
@@ -52,15 +52,22 @@ let far = 1000;
 
 
 let line = [];
-let r = left / 2;
-for (let a = 90; a <= 270; a += 20) {
+let r = left;
+let a = 0;
+for (a = 90; a <= 270; a += 11) {
+    let cos = r * Math.cos(a * Math.PI / 180);
+    let sin = r * Math.sin(a * Math.PI / 180);
+    line.push(cos, sin, far / 2, 1);
+}
+if (a > 270) {
+    a = 270;
     let cos = r * Math.cos(a * Math.PI / 180);
     let sin = r * Math.sin(a * Math.PI / 180);
     line.push(cos, sin, far / 2, 1);
 }
 
 let lines = [line];
-let steps = 20;
+let steps = 31;
 for (let i = 1; i < steps; i++) {
     let rotateMatrix = util.createRotateMatrix({ x: 0, z: far / 2 }, (360 / (steps - 1)) * i, 'y');
     let newLine = [];
@@ -78,9 +85,6 @@ let colors = [];
 let optionColors = [[0.0, 1.0, 1.0, 1.0], [0.0, 0.5, 0.5, 1.0]]
 let count = 0
 for (let i = 0; i < points.length; i += 24) {
-    let r = Math.random();
-    let g = Math.random();
-    let b = Math.random();
     colors.push(...optionColors[count % 2]);
     colors.push(...optionColors[count % 2]);
     colors.push(...optionColors[count % 2]);
@@ -103,14 +107,14 @@ let colorBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
 
-let cameraPos = [0, top / 4, near + 100];
-let cameraMat = util.lookAt(cameraPos, [0, 0, far / 2], [0, 1, 0]);
+let cameraPos = [0, top / 4, 0];
+let cameraMat = util.lookAt(cameraPos, [0, 0, far], [0, 1, 0]);
 cameraMat = util.inverse(cameraMat);
 
 
 
 let uniforms = {
-    u_world: util.createPerspective(near, far, left, right, top, bottom),
+    u_world: util.createPerspective(near, 2 * far, left, right, top, bottom),
     u_camera: cameraMat,
     u_rotateX: util.createRotateMatrix({ y: 0, z: far / 2 }, 0, 'x'),
     u_rotateY: util.createRotateMatrix({ x: 0, z: far / 2 }, 0, 'y')

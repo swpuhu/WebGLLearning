@@ -760,11 +760,11 @@ function generateTrianglesByLines (lines) {
             let nextPoint2Z = points2[i + 6];
             ret.push(
                 point2X, point2Y, point2Z, 1,
+                nextPoint1X, nextPoint1Y, nextPoint1Z, 1,
                 point1X, point1Y, point1Z, 1,
                 nextPoint1X, nextPoint1Y, nextPoint1Z, 1,
-                nextPoint1X, nextPoint1Y, nextPoint1Z, 1,
+                point2X, point2Y, point2Z, 1,
                 nextPoint2X, nextPoint2Y, nextPoint2Z, 1,
-                point2X, point2Y, point2Z, 1
             );
         }
         baseLine = line;
