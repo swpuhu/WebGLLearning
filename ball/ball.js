@@ -16,9 +16,10 @@ const vertexShader = `
     uniform mat4 u_camera;
     uniform mat4 u_rotateX;
     uniform mat4 u_rotateY;
+    uniform mat4 u_translate;
     // uniform vec4 u_camera;
     void main () {
-        gl_Position = u_world * u_camera * u_rotateX * u_rotateY * a_position;
+        gl_Position = u_world * u_camera * u_translate * u_rotateX * u_rotateY * a_position;
         v_color = a_color;
     }
 `
@@ -88,9 +89,9 @@ for (let i = 0; i < points.length; i += 24) {
     colors.push(...optionColors[count % 2]);
     colors.push(...optionColors[count % 2]);
     colors.push(...optionColors[count % 2]);
-    colors.push(...optionColors[count % 2]);
-    colors.push(...optionColors[count % 2]);
-    colors.push(...optionColors[count % 2]);
+    colors.push(...optionColors[(count + 1) % 2]);
+    colors.push(...optionColors[(count + 1) % 2]);
+    colors.push(...optionColors[(count + 1) % 2]);
     count++;
 }
 
@@ -107,7 +108,7 @@ let colorBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
 
-let cameraPos = [0, top / 4, 0];
+let cameraPos = [0, 0, 0];
 let cameraMat = util.lookAt(cameraPos, [0, 0, far], [0, 1, 0]);
 cameraMat = util.inverse(cameraMat);
 
@@ -117,7 +118,8 @@ let uniforms = {
     u_world: util.createPerspective(near, 2 * far, left, right, top, bottom),
     u_camera: cameraMat,
     u_rotateX: util.createRotateMatrix({ y: 0, z: far / 2 }, 0, 'x'),
-    u_rotateY: util.createRotateMatrix({ x: 0, z: far / 2 }, 0, 'y')
+    u_rotateY: util.createRotateMatrix({ x: 0, z: far / 2 }, 0, 'y'),
+    u_translate: util.createTranslateMatrix(0, 0, 0)
 }
 
 let attribs = {
@@ -140,7 +142,7 @@ gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
 let rotateX = 0;
 let rotateY = 0
 let rotateXStep = 0.5;
-let rotateYStep = 1.0;
+let rotateYStep = 0.5;
 function animate () {
     requestAnimationFrame(animate);
     rotateX += rotateXStep;
@@ -152,3 +154,9 @@ function animate () {
 }
 
 animate();
+
+let translateZ = 0;
+canvas.onwheel = function (e) {
+    translateZ += e.deltaY / 10;
+    uniforms.u_translate = util.createTranslateMatrix(0, 0, translateZ);
+}

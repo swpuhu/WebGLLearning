@@ -30,6 +30,14 @@ let params = {
         descent: 265,
         unitsPerEm: 1000,
         url: '../../assets/fonts/ACaslonPro-Bold.otf'
+    },
+    'Microsoft YaHei': {
+        winAscent: 2167,
+        winDescent: 536,
+        ascent: 1663,
+        descent: 519,
+        unitsPerEm: 2048,
+
     }
 }
 
@@ -55,7 +63,7 @@ let canvas = document.getElementById('canvas');
 let context = canvas.getContext('2d');
 
 
-function loadFont(fontFamily, url) {
+function loadFont (fontFamily, url) {
     return new Promise((resolve, reject) => {
         let font = new FontFace(fontFamily, `url(${url})`);
         font.load().then(() => {
@@ -66,8 +74,9 @@ function loadFont(fontFamily, url) {
 
 }
 
-function checkAndLoadFont(name, url = '') {
+function checkAndLoadFont (name, url = '') {
     return new Promise((resolve, reject) => {
+        if (name === 'Microsoft YaHei') resolve();
         let values = document.fonts.values();
         let isHave = false;
         let item = values.next();
@@ -93,11 +102,11 @@ function checkAndLoadFont(name, url = '') {
     })
 }
 
-function isBlank(char) {
+function isBlank (char) {
     return /\s/.test(char);
 }
 
-function isPunctuation(char) {
+function isPunctuation (char) {
     return /[,\.";:]/.test(char);
 }
 
@@ -107,7 +116,7 @@ function isPunctuation(char) {
  * @param {CanvasRenderingContext2D} context 
  * @param {string} text 
  */
-function drawText(context, text, offsetX, offsetY, lineHeightPx) {
+function drawText (context, text, offsetX, offsetY, lineHeightPx) {
     let totalWidth = context.measureText(text).width;
     let lines = Math.ceil(totalWidth / sectionWidth);
     let cursor = 0;
@@ -177,7 +186,7 @@ function drawText(context, text, offsetX, offsetY, lineHeightPx) {
 
 }
 
-function render() {
+function render () {
     let bool = checkAndLoadFont(fontFamily, params[fontFamily].url).then(() => {
         if (bool) {
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -227,7 +236,7 @@ function render() {
 }
 
 
-function DashBoard(wrapper) {
+function DashBoard (wrapper) {
     let font = document.createElement('select');
     for (let key in params) {
         let option = document.createElement('option');
@@ -277,7 +286,7 @@ function DashBoard(wrapper) {
     flexLineHeight.appendChild(nameLineHeight);
     flexLineHeight.appendChild(inputLineHeight);
 
-    
+
     let flexFontSize = document.createElement('div');
     flexFontSize.classList.add('flex')
     let nameFontSize = document.createElement('div');
@@ -297,7 +306,7 @@ function DashBoard(wrapper) {
     wrapper.appendChild(italic);
     wrapper.appendChild(flexLineHeight);
     wrapper.appendChild(flexFontSize);
-    
+
 
 
 

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const filePath = path.resolve(__dirname, '../../assets/fonts/SHOWG.TTF');
+const filePath = path.resolve(__dirname, '../../assets/fonts/ACaslonPro-Bold.otf');
 const opentype = require('opentype.js');
 const debug = require('debug');
 
