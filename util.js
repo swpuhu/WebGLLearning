@@ -779,9 +779,9 @@ function generateTrianglesByLines (lines, needNormals) {
         baseLine = line;
     }
     if(needNormals) {
-        return [ret, normals];
+        return [new Float32Array(ret), new Float32Array(normals)];
     } else {
-        return ret;
+        return new Float32Array(ret);
     }
 }
 

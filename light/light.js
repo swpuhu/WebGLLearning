@@ -12,6 +12,7 @@ const vertexShader = `
     attribute vec4 a_position;
     attribute vec4 a_color;
     attribute vec3 a_normals;
+    varying vec4 v_normals;
     varying vec4 v_color;
     uniform mat4 u_world;
     uniform mat4 u_camera;
@@ -21,14 +22,20 @@ const vertexShader = `
     void main () {
         gl_Position = u_world * u_camera * u_translate * u_rotateY * u_rotateX * a_position;
         v_color = a_color;
+        v_normals = u_translate * u_rotateY * u_rotateX * vec4(a_normals, 1.0);
     }
 `
 
 const fragmentShader = `
     precision mediump float;
     varying vec4 v_color;
+    varying vec4 v_normals;
+    uniform vec3 u_lightDirection;
     void main () {
+        vec3 normal = normalize(v_normals.xyz);
+        float light = dot(normal, u_lightDirection);
         gl_FragColor = v_color;
+        gl_FragColor.rgb *= light;
     }
 
 `
@@ -73,13 +80,10 @@ for (let i = 1; i < 5; i++) {
     lines.push(newLine);
 }
 let [points, normals] = util.generateTrianglesByLines(lines, true);
-points = new Float32Array(points);
-console.log(normals);
-console.log(points);
 
 
 let colors = [];
-let optionColors = [[0.0, 1.0, 1.0, 1.0], [0.0, 0.5, 0.5, 1.0]]
+let optionColors = [[0.0, 1.0, 1.0, 1.0], [0.0, 0.8, 0.8, 1.0]]
 let count = 0
 for (let i = 0; i < points.length; i += 24) {
     colors.push(...optionColors[count % 2]);
@@ -104,6 +108,11 @@ let colorBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
 
+let normalBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+console.log(normals);
+
 let cameraPos = [0, 0, 0];
 let cameraMat = util.lookAt(cameraPos, [0, 0, far], [0, 1, 0]);
 cameraMat = util.inverse(cameraMat);
@@ -115,7 +124,8 @@ let uniforms = {
     u_camera: cameraMat,
     u_rotateX: util.createRotateMatrix({ y: centerY, z: centerZ}, 0, 'x'),
     u_rotateY: util.createRotateMatrix({ x: centerX, z: centerZ}, 0, 'y'),
-    u_translate: util.createTranslateMatrix(0, 0, 0)
+    u_translate: util.createTranslateMatrix(0, 0, 0),
+    u_lightDirection: new Float32Array([1.0, -1.0, 1.0])
 }
 
 let attribs = {
@@ -126,6 +136,10 @@ let attribs = {
     a_color: {
         buffer: colorBuffer,
         numComponents: 4
+    },
+    a_normals: {
+        buffer: normalBuffer,
+        numComponents: 3
     }
 }
 
@@ -141,7 +155,7 @@ let rotateXStep = 0.5;
 let rotateYStep = 0.5;
 function animate () {
     requestAnimationFrame(animate);
-    // rotateX += rotateXStep;
+    rotateX += rotateXStep;
     rotateY += rotateYStep;
     uniforms.u_rotateX = util.createRotateMatrix({ y: centerY, z: centerZ}, rotateX, 'x');
     uniforms.u_rotateY = util.createRotateMatrix({ x: centerX, z: centerZ }, rotateY, 'y');
@@ -149,7 +163,7 @@ function animate () {
     gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
 }
 
-// animate();
+animate();
 
 let translateZ = 0;
 canvas.onwheel = function (e) {
