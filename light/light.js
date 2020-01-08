@@ -125,7 +125,7 @@ let uniforms = {
     u_rotateX: util.createRotateMatrix({ y: centerY, z: centerZ}, 0, 'x'),
     u_rotateY: util.createRotateMatrix({ x: centerX, z: centerZ}, 0, 'y'),
     u_translate: util.createTranslateMatrix(0, 0, 0),
-    u_lightDirection: new Float32Array([1.0, -1.0, 1.0])
+    u_lightDirection: new Float32Array([0.0, 0.0, 1.2])
 }
 
 let attribs = {
