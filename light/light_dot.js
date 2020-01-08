@@ -14,15 +14,22 @@ const vertexShader = `
     attribute vec3 a_normals;
     varying vec4 v_normals;
     varying vec4 v_color;
+    varying vec3 v_surfaceToLight;
+    varying vec3 v_surfaceToView;
     uniform mat4 u_world;
     uniform mat4 u_camera;
     uniform mat4 u_rotateX;
     uniform mat4 u_rotateY;
     uniform mat4 u_translate;
+    uniform vec3 u_lightWorldPosition;
+    uniform vec3 u_viewWorldPosition;
     void main () {
         gl_Position = u_world * u_camera * u_translate * u_rotateY * u_rotateX * a_position;
         v_color = a_color;
         v_normals = u_translate * u_rotateY * u_rotateX * vec4(a_normals, 1.0);
+        vec3 surfaceWorldPosition = (u_translate * u_rotateY * u_rotateX * a_position).xyz;
+        v_surfaceToLight = u_lightWorldPosition - surfaceWorldPosition;
+        v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
     }
 `
 
@@ -30,18 +37,31 @@ const fragmentShader = `
     precision mediump float;
     varying vec4 v_color;
     varying vec4 v_normals;
+    varying vec3 v_surfaceToLight;
+    varying vec3 v_surfaceToView;
     uniform vec3 u_lightDirection;
+    uniform float u_shininess;
     void main () {
         vec3 normal = normalize(v_normals.xyz);
-        float light = dot(normal, u_lightDirection);
+        vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
+        vec3 surfaceToViewDirection = normalize(v_surfaceToView);
+        vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
+        float light = dot(normal, -surfaceToLightDirection);
+        float specular = 0.0;
+        if (light > 0.0) {
+            specular = pow(dot(normal, -halfVector), u_shininess);
+        }
         gl_FragColor = v_color;
         gl_FragColor.rgb *= light;
+        gl_FragColor.rgb += specular;
     }
 
 `
 
 
 let gl = canvas.getContext('webgl');
+// gl.clearColor(0.0, 0.0, 0.0, 1.0);
+// gl.clear(gl.COLOR_BUFFER_BIT);
 let program = util.initWebGL(gl, vertexShader, fragmentShader);
 gl.useProgram(program);
 gl.enable(gl.DEPTH_TEST);
@@ -123,9 +143,12 @@ let uniforms = {
     u_world: util.createPerspective(near, 2 * far, left, right, top, bottom),
     u_camera: cameraMat,
     u_rotateX: util.createRotateMatrix({ y: centerY, z: centerZ }, 0, 'x'),
-    u_rotateY: util.createRotateMatrix({ x: centerX, z: centerZ }, 0, 'y'),
+    u_rotateY: util.createRotateMatrix({ x: centerX, z: centerZ }, 45, 'y'),
     u_translate: util.createTranslateMatrix(0, 0, 0),
-    u_lightDirection: new Float32Array([0.0, 0.0, 1.2])
+    u_lightDirection: new Float32Array([0.0, 0.0, 1.2]),
+    u_lightWorldPosition: new Float32Array([0, 0, 0]),
+    u_viewWorldPosition: new Float32Array(cameraPos),
+    u_shininess: 200
 }
 
 let attribs = {
@@ -151,7 +174,7 @@ gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
 
 let rotateX = 0;
 let rotateY = 0;
-let rotateXStep = 0.5;
+let rotateXStep = 0;
 let rotateYStep = 0.5;
 function animate () {
     requestAnimationFrame(animate);
@@ -169,6 +192,6 @@ let translateZ = 0;
 canvas.onwheel = function (e) {
     translateZ += e.deltaY / 10;
     uniforms.u_translate = util.createTranslateMatrix(0, 0, translateZ);
-    // util.setUniforms(uniformSetters, uniforms);
-    // gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
+    util.setUniforms(uniformSetters, uniforms);
+    gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
 }
