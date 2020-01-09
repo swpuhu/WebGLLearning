@@ -60,8 +60,8 @@ const fragmentShader = `
 
 
 let gl = canvas.getContext('webgl');
-// gl.clearColor(0.0, 0.0, 0.0, 1.0);
-// gl.clear(gl.COLOR_BUFFER_BIT);
+gl.clearColor(0.2, 0.2, 0.2, 1.0);
+gl.clear(gl.COLOR_BUFFER_BIT);
 let program = util.initWebGL(gl, vertexShader, fragmentShader);
 gl.useProgram(program);
 gl.enable(gl.DEPTH_TEST);
@@ -74,13 +74,13 @@ let left = -320;
 let right = 320;
 let top = 180;
 let bottom = -180;
-let near = 100;
-let far = 1000;
+let near = 320;
+let far = 2000;
 let centerX = 0;
 let centerY = 0;
 let centerZ = far / 2;
 
-let r = 200;
+let r = 500;
 let line = [
     centerX, centerY - r / 2, centerZ, 1,
     r + centerX, centerY - r / 2, centerZ, 1,
@@ -140,15 +140,15 @@ cameraMat = util.inverse(cameraMat);
 
 
 let uniforms = {
-    u_world: util.createPerspective(near, 2 * far, left, right, top, bottom),
+    u_world: util.createPerspective(near, 3 * far, left, right, top, bottom),
     u_camera: cameraMat,
     u_rotateX: util.createRotateMatrix({ y: centerY, z: centerZ }, 0, 'x'),
-    u_rotateY: util.createRotateMatrix({ x: centerX, z: centerZ }, 45, 'y'),
+    u_rotateY: util.createRotateMatrix({ x: centerX, z: centerZ }, 0, 'y'),
     u_translate: util.createTranslateMatrix(0, 0, 0),
     u_lightDirection: new Float32Array([0.0, 0.0, 1.2]),
-    u_lightWorldPosition: new Float32Array([0, 0, 0]),
+    u_lightWorldPosition: new Float32Array([0, 0, near]),
     u_viewWorldPosition: new Float32Array(cameraPos),
-    u_shininess: 200
+    u_shininess: 100
 }
 
 let attribs = {
@@ -174,7 +174,7 @@ gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
 
 let rotateX = 0;
 let rotateY = 0;
-let rotateXStep = 0;
+let rotateXStep = 0.8;
 let rotateYStep = 0.5;
 function animate () {
     requestAnimationFrame(animate);
@@ -183,6 +183,7 @@ function animate () {
     uniforms.u_rotateX = util.createRotateMatrix({ y: centerY, z: centerZ }, rotateX, 'x');
     uniforms.u_rotateY = util.createRotateMatrix({ x: centerX, z: centerZ }, rotateY, 'y');
     util.setUniforms(uniformSetters, uniforms);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
 }
 
@@ -190,8 +191,8 @@ animate();
 
 let translateZ = 0;
 canvas.onwheel = function (e) {
-    translateZ += e.deltaY / 10;
+    translateZ += e.deltaY;
     uniforms.u_translate = util.createTranslateMatrix(0, 0, translateZ);
     util.setUniforms(uniformSetters, uniforms);
-    gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
+    // gl.drawArrays(gl.TRIANGLES, 0, points.length / 4);
 }
