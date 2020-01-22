@@ -7,6 +7,15 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <style>
+        /* @font-face {
+            font-family: "SRG SSR Type Heavy";
+            src: url('../../assets/fonts/SRGSSRType_He.ttf');
+        } */
+
+        @font-face {
+            font-family: "SRG SSR Type";
+            src: url('../../assets/fonts/SRGSSRType_BdIt.ttf');
+        }
         div {
             position: relative;
         }
@@ -19,11 +28,16 @@
             margin: 0;
         }
 
-        p {
+        span {
+            width: 382px;
             margin: 0;
-            width: 300px;
+            white-space: pre-wrap;
+            font-size: 28px;
+            font-style: italic;
             word-break: break-all;
-            /* white-space: pre-wrap; */
+            font-family: "SRG SSR Type";
+            font-weight: bold;
+            white-space: pre-wrap;
         }
 
         canvas {
@@ -43,20 +57,25 @@
 
 <body>
     <div>
-        <p class="absolute">
-            qweradsf<br>qwerasdfasdf<br>wertwefgsdfgsdfg sdfgerwt sdfgsdfgsdfgsdfgsdfgsdfgsdfg<br>wretwertwertwert
-        </p>
+        <span class="absolute">SRG SSR Type - bold the quick 123</span>
 
         <!-- <p class="absolute">
             Hello
         </p> -->
         <canvas id="canvas" class="absolute" width="1920" height="1080"></canvas>
+        <select name="" id="">
+            <option value="">1</option>
+            <option value="">2</option>
+            <option value="">3</option>
+            <option value="">4</option>
+            <option value="">5</option>
+        </select>
     </div>
     <div class="dashboard absolute">
 
     </div>
 
 </body>
-<script src="./font2.js"></script>
+<script src="./font2_baseline.js"></script>
 
 </html>

@@ -331,10 +331,10 @@ jove.fonts = [
         "descent": -492
     },
     {
-        "preferredFamily": "SRG SSR Type",
-        "fontFamily": "SRG SSR Type",
-        "fontSubFamily": "SRG SSR Type",
-        "fileName": "SRGSSRType_Rg.ttf",
+        "preferredFamily": "SRG SSR Type Serif",
+        "fontFamily": "SRG SSR Type Serif Medium",
+        "fontSubFamily": "SRG SSR Type Serif Medium",
+        "fileName": "SRGSSRTypeSerif_Md.ttf",
         "winAscent": 1019,
         "winDescent": 272,
         "unitsPerEm": 1000,
@@ -365,9 +365,9 @@ jove.fonts = [
     },
     {
         "preferredFamily": "SRG SSR Type",
-        "fontFamily": "SRG SSR Type",
-        "fontSubFamily": "SRG SSR Type",
-        "fileName": "SRGSSRType_Rg.ttf",
+        "fontFamily": "SRG SSR Type Heavy",
+        "fontSubFamily": "SRG SSR Type Heavy",
+        "fileName": "SRGSSRType_He.ttf",
         "winAscent": 963,
         "winDescent": 315,
         "unitsPerEm": 1000,
@@ -380,11 +380,13 @@ jove.fonts = [
         "fontFamily": "SRG SSR Type Bold Italic",
         "fontSubFamily": "SRG SSR Type",
         "fileName": "SRGSSRType_BdIt.ttf",
-        "winAscent": 1015,
-        "winDescent": 263,
+        "winAscent": 963,
+        "winDescent": 315,
         "unitsPerEm": 1000,
         "ascent": 673,
-        "descent": -327
+        "descent": -327,
+        "underlinePosition": -100,
+        "underlineThickness": 50
     },
     {
         "preferredFamily": "Microsoft YaHei",
@@ -555,7 +557,7 @@ window.drawText = function drawText (text, fontFamily = 'Microsoft YaHei', fontS
             context.clearRect(0, 0, width, height);
             context.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
             context.textAlign = textAlign;
-            context.textBaseline = 'top';
+            context.textBaseline = 'alphabetic';
             if (shadowColor) {
                 context.shadowColor = shadowColor;
                 context.shadowOffsetX = 2;
@@ -591,7 +593,7 @@ window.drawText = function drawText (text, fontFamily = 'Microsoft YaHei', fontS
             if (diffWinAscent < 0) {
                 diffWinAscent = 0;
             }
-            let offsetY = halfLineHeight + diffWinAscent;
+            let offsetY = winAscent / (winAscent + winDescent) * fontSize
             let offsetX = 0;
             if (textAlign === 'left') {
                 offsetX = 0;
