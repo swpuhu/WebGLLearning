@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas class="canvas" width="640" height="360"></canvas>
+</body>
+<script type="module">
+    import util from './util.js';
+    const vertexShader = `
+        attribute vec4 a_position;
+        uniform mat4 u_projection;
+        void main () {
+            gl_Position = u_projection * a_position;
+        }
+    `
+    const fragmentShader = `
+        precision mediump float;
+        void main () {
+            gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+        }
+
+    `
+    let width = 640;
+    let height = 360;
+    let z = 200;
+    let depth = 100;
+    let points = new Float32Array([
+        -width / 2, -height / 2, z, 0.0, 0.0,
+        width / 2, -height / 2, z, 1.0, 0.0,
+        width / 2, height / 2, z, 1.0, 1.0,
+        width / 2, height / 2, z, 1.0, 1.0,
+        -width / 2, height / 2, z, 0.0, 1.0,
+        -width / 2, -height / 2, z, 0.0, 0.0,
+    ]);
+    /**
+     * @type {HTMLCanvasElement}
+     **/
+    let canvas = document.querySelector('.canvas');
+    let gl = canvas.getContext('webgl');
+    let program = util.initWebGL(gl, vertexShader, fragmentShader);
+    gl.useProgram(program);
+    let buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+    let attributeSetter = util.createAttributeSetters(gl, program);
+    let uniformSetter = util.createUniformSetters(gl, program);
+    let f32size = Float32Array.BYTES_PER_ELEMENT;
+    let attributes = {
+        a_position: {
+            numComponents: 3,
+            buffer: buffer,
+            stride: 5 * f32size,
+            offset: 0 * f32size
+        },
+
+    }
+    let uniforms = {
+        u_projection: util.createPerspective(100, 500, -width / 2, width / 2, -height / 2, height / 2)
+    }
+    util.setAttributes(attributeSetter, attributes);
+    util.setUniforms(uniformSetter, uniforms);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+
+    
+
+
+</script>
+</html>

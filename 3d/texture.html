@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas class="canvas" width="640" height="360"></canvas>
+</body>
+<script type="module">
+    import util from '../util.js';
+    const vertexShader = `
+        attribute vec4 a_position;
+        attribute vec2 a_texCoord;
+        uniform mat4 u_projection;
+        varying vec2 v_texCoord;
+        uniform mat4 u_rotateX;
+        uniform mat4 u_rotateY;
+        uniform mat4 u_rotateZ;
+        void main () {
+            gl_Position = u_projection * u_rotateX * u_rotateY * u_rotateZ * a_position;
+            v_texCoord = a_texCoord;
+        }
+    `
+    const fragmentShader = `
+        precision mediump float;
+        varying vec2 v_texCoord;
+        uniform sampler2D u_texture;
+        void main () {
+            gl_FragColor = texture2D(u_texture, v_texCoord);
+        }
+
+    `
+    let width = 640;
+    let height = 360;
+    
+    let depth = 100;
+    let near = 1000;
+    let far = 2000;
+    let z = (near + far) / 2;
+    let w = width / near * z;
+    let h = height / near * z;
+    
+    let points = new Float32Array([
+        -w / 2, -h / 2, z, 0.0, 0.0,
+        w / 2, -h / 2, z, 1.0, 0.0,
+        w / 2, h / 2, z, 1.0, 1.0,
+        w / 2, h / 2, z, 1.0, 1.0,
+        -w / 2, h / 2, z, 0.0, 1.0,
+        -w / 2, -h / 2, z, 0.0, 0.0,
+    ]);
+    /**
+     * @type {HTMLCanvasElement}
+     **/
+    let canvas = document.querySelector('.canvas');
+    let gl = canvas.getContext('webgl');
+    let program = util.initWebGL(gl, vertexShader, fragmentShader);
+    gl.useProgram(program);
+    let buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+    let texture = util.createTexture(gl);
+    let image = new Image();
+    image.src = '../../assets/test2.png';
+    image.onload = function () {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+    let attributeSetter = util.createAttributeSetters(gl, program);
+    let uniformSetter = util.createUniformSetters(gl, program);
+    let f32size = Float32Array.BYTES_PER_ELEMENT;
+    let attributes = {
+        a_position: {
+            numComponents: 3,
+            buffer: buffer,
+            stride: 5 * f32size,
+            offset: 0 * f32size
+        },
+        a_texCoord: {
+            numComponents: 2,
+            buffer: buffer,
+            stride: 5 * f32size,
+            offset: 3 * f32size
+        }
+
+    }
+    let uniforms = {
+        u_projection: util.createPerspective(near, far, -width / 2, width / 2, -height / 2, height / 2),
+        u_rotateX: util.createRotateMatrix({y: height / 2, z: z}, 0, 'x'),
+        u_rotateY: util.createRotateMatrix({x: width / 2, z: z}, 0, 'y'),
+        u_rotateZ: util.createRotateMatrix({x: width / 2, y: height / 2}, 0, 'z'),
+    }
+    util.setAttributes(attributeSetter, attributes);
+    util.setUniforms(uniformSetter, uniforms);
+
+    let input = document.createElement('input');
+    input.type = 'range';
+    let label = document.createElement('label');
+
+    input.min = 0;
+    input.max = 180;
+    input.step = 1;
+    input.oninput = function () {
+        uniforms.u_rotateX = util.createRotateMatrix({y: 0, z: z}, input.value, 'x');
+        label.textContent = this.value;
+        util.setUniforms(uniformSetter, uniforms);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    document.body.appendChild(input);
+    document.body.appendChild(label);
+    // gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+
+    
+
+
+</script>
+</html>

@@ -53,7 +53,7 @@ function createProjection (width, height, depth) {
         2 / width, 0, 0, 0,
         0, 2 / height, 0, 0,
         0, 0, 2 / depth, 0,
-        -1, -1, 0, 1,
+        -1, -1, -1, 1,
     ];
 }
 
@@ -891,24 +891,26 @@ function createUniformSetters (gl, program) {
             for (let ii = 0; ii < info.size; ++ii) {
                 units.push(textureUnit++);
             }
-            return function (bindPoint, units) {
-                return function (textures) {
-                    gl.uniform1iv(location, units);
-                    textures.forEach(function (texture, index) {
-                        gl.activeTexture(gl.TEXTURE0 + units[index]);
-                        gl.bindTexture(bindPoint, texture);
-                    });
-                };
-            }(getBindPointForSamplerType(gl, type), units);
+            return function () {};
+            // return function (bindPoint, units) {
+            //     return function (textures) {
+            //         gl.uniform1iv(location, units);
+            //         textures.forEach(function (texture, index) {
+            //             gl.activeTexture(gl.TEXTURE0 + units[index]);
+            //             gl.bindTexture(bindPoint, texture);
+            //         });
+            //     };
+            // }(getBindPointForSamplerType(gl, type), units);
         }
         if (type === gl.SAMPLER_2D || type === gl.SAMPLER_CUBE) {
-            return function (bindPoint, unit) {
-                return function (texture) {
-                    gl.uniform1i(location, unit);
-                    gl.activeTexture(gl.TEXTURE0 + unit);
-                    gl.bindTexture(bindPoint, texture);
-                };
-            }(getBindPointForSamplerType(gl, type), textureUnit++);
+            return function(){}
+            // return function (bindPoint, unit) {
+            //     return function (texture) {
+            //         gl.uniform1i(location, unit);
+            //         gl.activeTexture(gl.TEXTURE0 + unit);
+            //         gl.bindTexture(bindPoint, texture);
+            //     };
+            // }(getBindPointForSamplerType(gl, type), textureUnit++);
         }
         throw ('unknown type: 0x' + type.toString(16)); // we should never get here.
     }
@@ -980,6 +982,13 @@ function setAttributes (setters, attribs) {
     });
 }
 
+function scalePoint (x, y, scaleX, scaleY, center) {
+    return [
+        (x - center.x) * scaleX + center.x, 
+        (y - center.y) * scaleY + center.y
+    ]
+}
+
 export default {
     initWebGL,
     createProjection,
@@ -1011,5 +1020,6 @@ export default {
     createAttributeSetters,
     setUniforms,
     setAttributes,
-    generateTrianglesByLines
+    generateTrianglesByLines,
+    scalePoint
 }
