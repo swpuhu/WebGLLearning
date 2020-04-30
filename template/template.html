@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script type="module">
+    import util from '../util.js';
+    const vertexShader = `
+        attribute vec4 a_position;
+        uniform mat4 u_projection;
+        void main () {
+            gl_Position = u_projection * a_position;
+        }
+    `;
+
+    const fragShader = `
+        precision mediump float;
+        const float PI = 3.1415926;
+        void main () {
+            vec2 pos = gl_FragCoord.xy;
+            float angle = atan(pos.y - 180., pos.x - 320.);
+            float r = length(vec2(pos.y - 180., pos.x - 320.));
+            angle = abs(angle);
+            float distance = 200.0;
+            float d = 0.;
+            float N = 3.;
+            float a = (360. / N) / 180. * PI;
+            if (mod(angle, a) < a / 2.) {
+                d = cos(a / 2. - mod(angle, a / 2.));
+            } else {
+                d = cos(mod(angle, a / 2.));
+            }
+            if (r < distance) {
+                gl_FragColor = vec4(d * vec3(1.0, 1.0, 0.0), 1.0);
+            }
+            
+
+        }
+    `
+    let width = 640;
+    let height = 360;
+    let canvas = document.createElement('canvas');
+    document.body.appendChild(canvas);
+    canvas.width = width;
+    canvas.height = height;
+    let gl = canvas.getContext('webgl');
+    let pointsBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, pointsBuffer);
+    let points = new Float32Array([
+        0.0, 0.0,
+        width, 0.0,
+        width, height,
+        width, height,
+        0.0, height,
+        0.0, 0.0
+    ]);
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+    let program = util.initWebGL(gl, vertexShader, fragShader);
+    gl.useProgram(program);
+    let attribSetters = util.createAttributeSetters(gl, program);
+    let uniformSetters = util.createUniformSetters(gl, program);
+
+    let attributes = {
+        a_position: {
+            buffer: pointsBuffer,
+            numComponents: 2,
+        }
+    }
+
+    let uniforms = {
+        u_projection: util.createProjection(width, height, 1)
+    }
+
+    util.setAttributes(attribSetters, attributes);
+    util.setUniforms(uniformSetters, uniforms);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    
+</script>
+</html>

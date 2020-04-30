@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="http://localhost:3000/new-colorPicker/src/colorPicker.css">
+    <style>
+
+        #editor {
+            width: fit-content;
+            min-width: 500px;
+            height: fit-content;
+            min-height: 50px;
+            border: 1px solid rgb(243, 203, 27);
+            outline: none;
+        }
+        canvas {
+            border: 1px solid rgb(27, 243, 178);
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex;">
+        <div contenteditable="true" id="editor">
+            <div><br></div>
+        </div>
+        <canvas width="500" height="500" id="canvas"></canvas>
+    </div>
+    
+</body>
+<script src="http://localhost:3000/new-colorPicker/src/newColorPicker.js"></script>
+<script src="./index.js" type="module"></script>
+</html>

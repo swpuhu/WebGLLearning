@@ -21,8 +21,9 @@ const shader = {
     uniform float u_width;
     uniform float u_aspect;
     void main () {
-        vec2 sampleDivisor = vec2(u_width, u_width / u_aspect);
-        vec2 samplePos = v_texCoord - mod(v_texCoord, sampleDivisor) + 0.5 * sampleDivisor;
+        vec2 sampleDivisor = vec2(u_width * u_aspect, u_width);
+        vec2 pos = v_texCoord - 1.0 / u_resolution;
+        vec2 samplePos = pos - mod(pos - vec2(0.5, 0.5), sampleDivisor) + ( 0.5 * sampleDivisor);
         out_color = texture(u_texture, samplePos);
     }
     `
@@ -56,11 +57,11 @@ export default function (gl, projectionMat) {
     gl.uniform1i(u_texture, 0);
 
     const u_width = gl.getUniformLocation(program, 'u_width');
-    gl.uniform1f(u_width, 0.03);
+    gl.uniform1f(u_width, 0.5);
 
 
     const u_aspect = gl.getUniformLocation(program, 'u_aspect');
-    gl.uniform1f(u_aspect, 1);
+    gl.uniform1f(u_aspect, 9 / 16);
 
 
     function setFraction(width, aspect) {
