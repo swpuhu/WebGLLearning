@@ -99,16 +99,6 @@ class RichEditor {
         return [range.startContainer, range.endContainer, range.startOffset, range.endOffset];
     }
 
-    resetSelection (startContainer, endContainer, startOffset, endOffset) {
-        let selection = document.getSelection();
-        let count = selection.rangeCount;
-        selection.removeAllRanges();
-        let range = new Range();
-        range.setStart(startContainer, startOffset);
-        range.setEnd(endContainer, endOffset);
-        selection.addRange(range);
-    }
-
 
     _createUI () {
         let container = document.createElement('div');
@@ -131,18 +121,39 @@ class RichEditor {
             selections = this.getSelection();
         }
         fontSize.onchange = () => {
-            this.setFontSize(fontSize.value, selections);
+            this.resetSelection(...selections);
+            this.setFontSize(fontSize.value);
         }
 
+        let fontFamily = document.createElement('select');
+        for (let font of window.fontData) {
+            let option = document.createElement('option');
+            option.value = font.fullName;
+            option.textContent = font.fullName;
+            fontFamily.appendChild(option);
+        }
+        fontFamily.onchange = () => {
+            this.setFontFamily(fontFamily.value);
+        }
         
         container.appendChild(bold);
         container.appendChild(italic);
         container.appendChild(fontSize);
+        container.appendChild(fontFamily);
         return container;
     }
 
+    resetSelection (startContainer, endContainer, startOffset, endOffset) {
+        let selection = window.getSelection();
+        selection.removeAllRanges();
+        let range = document.createRange();
+        range.setStart(startContainer, startOffset);
+        range.setEnd(endContainer, endOffset);
+        selection.addRange(range);
+    }
+
     getHtml() {
-        return this.container.outerHTML;
+        return this.container;
     }
 }
 

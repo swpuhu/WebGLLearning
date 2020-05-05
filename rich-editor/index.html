@@ -18,14 +18,29 @@
         canvas {
             border: 1px solid rgb(27, 243, 178);
         }
+
+        @font-face {
+            font-family: 'ZhenyanGB';
+            src: url('/fonts/快编字体/锐字真言体.ttf');
+        }
+
+        @font-face {
+            font-family: 'Microsoft YaHei';
+            src: url('/fonts/msyh.ttf');
+        }
     </style>
 </head>
 <body>
-    <div style="display: flex;">
-        <div contenteditable="true" id="editor">
+    <div style="font-family: ZhenyanGB; font-size: 30px;">富文本编辑测试</div>
+    <div style="display: flex;">    
+        <div contenteditable="true" id="editor" style="font-family: Microsoft YaHei;">
             <div><br></div>
         </div>
         <canvas width="500" height="500" id="canvas"></canvas>
+    </div>
+
+    <div>
+        <input type="file" id="read-file">
     </div>
     
 </body>

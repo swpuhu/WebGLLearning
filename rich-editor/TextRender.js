@@ -30,15 +30,18 @@ function DFSHTML (html, handler) {
             if (html.childNodes[i] instanceof Text === false) {
                 let style = html.childNodes[i].getAttribute('style');
                 if (style) {
-                    obj.styles = parseStyleAttributes(style);
+                    res.styles = parseStyleAttributes(style);
                 }
             }
-            obj.children.push(res);
+            if (!/^\r?\n/.test(res)) {
+                obj.children.push(res);
+            }
         }
     }
     return obj;
 }
 
+window.dfs = DFSHTML;
 class TextRender {
     constructor(canvas, fonts) {
         /**
@@ -50,19 +53,33 @@ class TextRender {
 
     _analyze (html) {
         let fontFamilies = new Set();
-        let parser = new DOMParser();
-        html = html.trim();
-        html = parser.parseFromString(html, 'text/html');
+        // let parser = new DOMParser();
+        // html = html.trim();
+        // html = parser.parseFromString(html, 'text/html');
+        let map = new Map();
         let maxFontSize = 0;
         let font = '';
+        let currentFont = '';
         let json = DFSHTML(html, (item) => {
             if (item.style.fontFamily) {
                 fontFamilies.add(item.style.fontFamily);
             }
+            if (item.style.fontFamily) {
+                currentFont = item.style.fontFamily;
+            }
             if (item.style.fontSize) {
-                if (parseInt(item.style.fontSize) > maxFontSize) {
+                if (parseInt(item.style.fontSize) === maxFontSize) {
+                    let maxFontFamily = map.get(maxFontSize);
+                    let maxContentHeight = this._getBaselineOffset(maxFontFamily, maxFontSize)[1];
+                    let currentContentHeight = this._getBaselineOffset(currentFont, maxFontSize)[1];
+                    if (currentContentHeight > maxContentHeight) {
+                        map.set(maxFontSize, currentFont);
+                        font = currentFont;
+                    }
+                } else if (parseInt(item.style.fontSize) > maxFontSize) {
                     maxFontSize = parseInt(item.style.fontSize);
-                    font = item.style.fontFamily;
+                    font = currentFont;
+                    map.set(maxFontSize, font);
                 }
             }
         });
@@ -120,16 +137,20 @@ class TextRender {
     }
 
     _getBaselineOffset (font, fontSize, lineHeight) {
-        let params = this.fonts.find(item => (item.familyName === fontFamily));
+        let params = this.fonts.find(item => (item.fullName === font));
         let winAscent = params.winAscent;
         let winDescent = params.winDescent;
         let typoAscent = params.typoAscent;
         let typoDescent = -params.typoDescent;
+        let HHAscent = params.HHAscent;
+        let HHDescent = -params.HHDescent;
         let unitsPerEm = params.unitsPerEM;
         let useTypoMetrics = params.useTypoMetrics;
         fontSize = Math.floor(fontSize);
         let coefficient;
-        if (useTypoMetrics) {
+        if (/mac/i.test(navigator.platform)) {
+            coefficient = (HHAscent + HHDescent) / unitsPerEm;
+        } else if (useTypoMetrics) {
             coefficient = (typoAscent + typoDescent) / unitsPerEm;
         } else {
             coefficient = (winAscent + winDescent) / unitsPerEm;
@@ -144,7 +165,9 @@ class TextRender {
 
         let halfLineHeight = (lineHeightPx - contentHeight) / 2;
         let offsetY;
-        if (useTypoMetrics) {
+        if (/mac/i.test(navigator.platform)) {
+            offsetY = halfLineHeight + contentHeight * HHAscent / (HHAscent + HHDescent);
+        } else if (useTypoMetrics) {
             offsetY = halfLineHeight + contentHeight * typoAscent / (typoAscent + typoDescent);
         } else {
             offsetY = halfLineHeight + contentHeight * winAscent / (winAscent + winDescent);
@@ -181,6 +204,8 @@ class TextRender {
                 let winDescent = params.winDescent;
                 let typoAscent = params.typoAscent;
                 let typoDescent = -params.typoDescent;
+                let HHAscent = params.HHAscent;
+                let HHDescent = -params.HHDescent;
                 let unitsPerEm = params.unitsPerEM;
                 let useTypoMetrics = params.useTypoMetrics;
                 fontSize = Math.floor(fontSize);
@@ -222,7 +247,7 @@ class TextRender {
     }
 
     _draw (text, offsetX, offsetY, lineHeightPx, lineNums) {
-        let dY = i * lineHeightPx + offsetY
+        let dY = lineNums * lineHeightPx + offsetY;
         this.context.fillText(text, offsetX, dY);
         i++;
     }
