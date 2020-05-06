@@ -13,16 +13,32 @@ class RichEditor {
         this.container.addEventListener('input', () => {
             this.onchange && this.onchange();
         })
-        
+        // this.container.addEventListener('paste', this.paste.bind(this));
         console.log(editable);
         document.execCommand('styleWithCSS', false, true);
         if (showUI) {
             this.ui = this._createUI();
         }
     }
+
+    /**
+     * @param {ClipboardEvent} e
+     */
+    paste(e) {
+        e.preventDefault();
+        let data = e.clipboardData.getData('text/plain');
+        let range = window.getSelection().getRangeAt(0);
+        range.deleteContents();
+        let pasteText = document.createTextNode(data);
+        range.insertNode(pasteText);
+        range.collapse(false);
+    }
+
     hasSelection () {
         return document.getSelection().rangeCount > 0;
     }
+
+
     setBold () {
         if (this.hasSelection()) {
             document.execCommand('bold', false);

@@ -3,6 +3,17 @@ import {TextRender} from './TextRender.js';
 import {TrueTypeFont} from './TrueTypeFont.js';
 let container = document.getElementById('editor');
 let canvas = document.getElementById('canvas');
+let status = true;
+canvas.onclick = function () {
+    if (status) {
+        canvas.style.left = -container.offsetWidth + 'px';
+        
+    } else {
+        canvas.style.left = 0;
+    }
+    status = !status;
+    
+}
 window.assert = function (bool) {
     if (!bool) {
         throw new Error('');
@@ -39,7 +50,7 @@ function ajax (url, method = 'GET') {
     let button = document.createElement('button');
     button.textContent = 'Render';
     button.onclick = function () {
-        renderer.drawText(editor.getHtml().trim());
+        renderer.drawHTML(editor.getHtml());
     }
 
     editor.onchange = () => {
