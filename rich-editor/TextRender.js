@@ -74,6 +74,7 @@ class TextRender {
             let offsetX = 0;
             let offsetY = 0;
             let currentHeight = 0;
+            let prevLineHeight = 0;
             let help = (res, parentStyles, maxSize, maxSizeFont) => {
                 if (res.children) {
                     let styles = { ...parentStyles, ...res.styles };
@@ -82,7 +83,14 @@ class TextRender {
                         emptyLine = true;
                         ++lineCount;
                         offsetX = 0;
-                        offsetY += currentHeight;
+                        offsetY += prevLineHeight;
+                        if (res.lineHeight) {
+                            prevLineHeight = res.lineHeight;
+                        } else {
+                            let lineHeight = this._getBaselineOffset(defaultParams.fontFamily, defaultParams.fontSize)[1];
+                            prevLineHeight = lineHeight;
+                        }
+                        
                     }
                     let _maxSize = res.maxSize || maxSize;
                     let _maxSizeFont = res.maxSizeFont || maxSizeFont;
@@ -94,7 +102,7 @@ class TextRender {
                 } else {
                     let fontFamily = parentStyles['font-family'] || defaultParams.fontFamily;
                     let fontSize = parseInt(parentStyles['font-size']) || defaultParams.fontSize;
-                    let [baselineOffset, lineHeight, rate] = this._getBaselineOffset(maxSizeFont, maxSize);
+                    let [baselineOffset, lineHeight] = this._getBaselineOffset(maxSizeFont, maxSize);
                     let fontWeight = parentStyles['font-weight'] || 'normal';
                     let fontStyle = parentStyles['font-style'] || 'normal';
                     let color = parentStyles['color'];
@@ -167,7 +175,7 @@ class TextRender {
                 if (html.childNodes[i] instanceof Text === false && typeof res !== 'string') {
                     if (html.childNodes[i].tagName === 'DIV') {
                         res.isRow = true;
-                        [res.maxSize, res.maxSizeFont] = this.findMaxFont(res);
+                        [res.maxSize, res.maxSizeFont, res.lineHeight] = this.findMaxFont(res);
                     }
                     let style = html.childNodes[i].getAttribute('style');
                     if (style) {
@@ -188,6 +196,8 @@ class TextRender {
         let map = new Map();
         let maxContentHeight = 0;
         let queue = [[res, {}]];
+        let upper = 0;
+        let lower = 0;
         while (queue.length) {
             let [item, parentStyles] = queue.shift();
             let styles = {...item.styles, ...parentStyles};
@@ -195,7 +205,15 @@ class TextRender {
                 let fontSize = styles['font-size'] || defaultParams.fontSize;
                 fontSize = parseInt(fontSize);
                 let fontFamily = styles['font-family'] || defaultParams.fontFamily;
-                let contentHeight = this._getBaselineOffset(fontFamily, fontSize)[1];
+                let [offsetY, contentHeight, ratio] = this._getBaselineOffset(fontFamily, fontSize);
+                let _upper = contentHeight * ratio;
+                let _lower = contentHeight * (1 - ratio);
+                if (_upper > upper) {
+                    upper = _upper;
+                }
+                if (_lower > lower) {
+                    lower = _lower;
+                }
                 if (contentHeight > maxContentHeight) {
                     maxContentHeight = contentHeight;
                     maxFontSize = fontSize;
@@ -212,7 +230,8 @@ class TextRender {
                 }
             }
         }
-        return [maxFontSize, maxFontFamily];
+        let lineHeight = Math.round(upper + lower);
+        return [maxFontSize, maxFontFamily, lineHeight];
     }
 
 
