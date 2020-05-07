@@ -1,4 +1,5 @@
 import { checkAndLoadFont } from './FontLoader.js';
+import { RichEditor } from './RichEditor.js';
 
 const defaultParams = {
     fontSize: 16,
@@ -22,11 +23,18 @@ function parseStyleAttributes (str) {
 }
 
 class TextRender {
-    constructor(canvas, fonts) {
+    /**
+     * 
+     * @param {HTMLCanvasElement} canvas 
+     * @param {RichEditor} editor 
+     * @param {Object} fonts 
+     */
+    constructor(canvas, editor, fonts) {
         /**
          * @type {CanvasRenderingContext2D}
          */
         this.context = canvas.getContext('2d');
+        this.editor = editor;
         this.fonts = fonts;
     }
 
@@ -118,6 +126,9 @@ class TextRender {
     }
 
     _getBaselineOffset (font, fontSize, lineHeight) {
+        if (this.editor.container.style.lineHeight) {
+            lineHeight = +this.editor.container.style.lineHeight;
+        }
         let params = this.fonts.find(item => (item.fullName === font));
         let winAscent = params.winAscent;
         let winDescent = params.winDescent;
@@ -155,8 +166,8 @@ class TextRender {
             offsetY = halfLineHeight + contentHeight * typoAscent / (typoAscent + typoDescent);
             return [offsetY, lineHeightPx, typoAscent / (typoAscent + typoDescent)];
         } else {
-            offsetY = halfLineHeight + contentHeight * winAscent / (ascender + descender);
-            return [offsetY, lineHeightPx, winAscent / (ascender + descender)];
+            offsetY = halfLineHeight + contentHeight * winAscent / (winAscent + winDescent);
+            return [offsetY, lineHeightPx, winAscent / (winAscent + winDescent)];
         }
 
     }
@@ -200,26 +211,25 @@ class TextRender {
         let lower = 0;
         while (queue.length) {
             let [item, parentStyles] = queue.shift();
-            let styles = {...item.styles, ...parentStyles};
-            if (styles['font-size'] && styles['font-family'] || styles['font-family']) {
-                let fontSize = styles['font-size'] || defaultParams.fontSize;
-                fontSize = parseInt(fontSize);
-                let fontFamily = styles['font-family'] || defaultParams.fontFamily;
-                let [offsetY, contentHeight, ratio] = this._getBaselineOffset(fontFamily, fontSize);
-                let _upper = contentHeight * ratio;
-                let _lower = contentHeight * (1 - ratio);
-                if (_upper > upper) {
-                    upper = _upper;
-                }
-                if (_lower > lower) {
-                    lower = _lower;
-                }
+            let styles = { ...item.styles, ...parentStyles };
+            let fontSize = styles['font-size'] || defaultParams.fontSize;
+            fontSize = parseInt(fontSize);
+            let fontFamily = styles['font-family'] || defaultParams.fontFamily;
+            let [offsetY, contentHeight, ratio] = this._getBaselineOffset(fontFamily, fontSize);
+            if (styles['font-size'] || styles['font-family']) {
                 if (contentHeight > maxContentHeight) {
                     maxContentHeight = contentHeight;
                     maxFontSize = fontSize;
                     maxFontFamily = fontFamily;
-                }
-                
+                } 
+            }
+            let _upper = contentHeight * ratio;
+            let _lower = contentHeight * (1 - ratio);
+            if (_upper > upper) {
+                upper = _upper;
+            }
+            if (_lower > lower) {
+                lower = _lower;
             }
             if (item.children) {
                 for (let child of item.children) {
@@ -239,16 +249,16 @@ class TextRender {
         this.context.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
         this.context.textAlign = textAlign;
         this.context.textBaseline = 'alphabetic';
-        if (shadowColor) {
-            this.context.shadowColor = shadowColor;
+        if (1) {
+            this.context.shadowColor = '#000';
             this.context.shadowOffsetX = 2;
             this.context.shadowOffsetY = 2;
             this.context.shadowBlur = 2;
         }
         if (backgroundColor) {
-            this.context.fillStyle = backgroundColor;
-            this.context.rect(0, 0, canvas.width, canvas.height);
-            this.context.fill();
+            // this.context.fillStyle = backgroundColor;
+            // this.context.rect(0, 0, canvas.width, canvas.height);
+            // this.context.fill();
         }
         let width = this.context.measureText(text).width;
         this.context.fillStyle = color;

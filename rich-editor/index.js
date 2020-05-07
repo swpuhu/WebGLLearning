@@ -45,7 +45,7 @@ function ajax (url, method = 'GET') {
     window.fontData = fontData;
     let editor = new RichEditor(container, fontData, true);
     
-    let renderer = new TextRender(canvas, fontData);
+    let renderer = new TextRender(canvas, editor, fontData);
     window.renderer = renderer;
     let button = document.createElement('button');
     button.textContent = 'Render';
