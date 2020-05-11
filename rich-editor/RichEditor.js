@@ -55,6 +55,15 @@ class RichEditor {
         }
     }
 
+    setUnderline () {
+        if (this.hasSelection()) {
+            document.execCommand('underline', false);
+        } else {
+
+        }
+
+    }
+
     setForeColor (color, selection) {
         if (selection) {
             this.resetSelection(...selection)
@@ -128,6 +137,13 @@ class RichEditor {
         italic.onclick = () => {
             this.setItalic();
         }
+
+
+        let underline = document.createElement('button');
+        underline.textContent = 'U';
+        underline.onclick = () => {
+            this.setUnderline();
+        }
         let fontSize = document.createElement('input');
         fontSize.min = 12;
         fontSize.max = 100;
@@ -154,6 +170,7 @@ class RichEditor {
         
         container.appendChild(bold);
         container.appendChild(italic);
+        container.appendChild(underline);
         container.appendChild(fontSize);
         container.appendChild(fontFamily);
         return container;

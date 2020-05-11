@@ -492,7 +492,7 @@ function createEditor (name, type = 'range', min, max, value, step = 1) {
     return obj;
 }
 
-function MatMultiVec (v, m) {
+function vecMultiMat (v, m) {
     var dst = [];
     for (var i = 0; i < 4; ++i) {
         dst[i] = 0.0;
@@ -1008,7 +1008,7 @@ export default {
     pnpoly,
     createEditor,
     inverse,
-    MatMultiVec,
+    vecMultiMat,
     multiply,
     cross,
     subtractVectors,

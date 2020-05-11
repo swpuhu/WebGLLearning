@@ -249,7 +249,7 @@ class TextRender {
         this.context.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
         this.context.textAlign = textAlign;
         this.context.textBaseline = 'alphabetic';
-        if (1) {
+        if (shadowColor) {
             this.context.shadowColor = '#000';
             this.context.shadowOffsetX = 2;
             this.context.shadowOffsetY = 2;
@@ -263,6 +263,10 @@ class TextRender {
         let width = this.context.measureText(text).width;
         this.context.fillStyle = color;
         let dY = offsetY + baselineOffset;
+        this.context.strokeStyle = color;
+        this.context.moveTo(offsetX, dY);
+        this.context.lineTo(width, dY);
+        this.context.stroke();
         this.context.fillText(text, offsetX, dY);
         return width;
     }
