@@ -226,6 +226,9 @@ class TextRender {
         let queue = [[res, {}]];
         let upper = 0;
         let lower = 0;
+        if (res.children && res.children[0] && res.children[0].isRow) {
+            return [res.children[0].maxFontSize, res.children[0].maxFontFamily, res.children[0].lineHeight];
+        }
         while (queue.length) {
             let [item, parentStyles] = queue.shift();
             let styles = { ...item.styles, ...parentStyles };
@@ -278,20 +281,16 @@ class TextRender {
             this.context.moveTo(offsetX, offsetY);
             this.context.fillRect(offsetX, offsetY, width, lineHeight);
         }
-        this.context.fillStyle = color;
         let dY = offsetY + baselineOffset;
-        this.context.strokeStyle = color;
-        this.context.moveTo(offsetX, offsetY + lineHeight);
-        this.context.lineTo(offsetX + width, offsetY + lineHeight);
-        this.context.stroke();
 
         if (underlineParams) {
-            
-            // this.context.lineWidth = underlineParams.underlineThickness + 1;
-            // let underlinePosition = dY - underlineParams.underlinePosition;
-            // this.context.moveTo(offsetX, underlinePosition);
-            // this.context.lineTo(width + offsetX, underlinePosition);
-            // this.context.stroke();
+            this.context.beginPath();
+            this.context.lineWidth = 2;
+            this.context.strokeStyle = '#000';
+            this.context.moveTo(offsetX, offsetY + lineHeight);
+            this.context.lineTo(offsetX + width, offsetY + lineHeight);
+            this.context.stroke();
+            this.context.lineWidth = 1;
         }
         this.context.strokeStyle = '#f00';
         this.context.fillText(text, offsetX, dY);
