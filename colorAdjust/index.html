@@ -38,11 +38,11 @@
     void main () {
 
         vec4 color = texture2D(u_texture, v_texCoord);
-        gl_FragColor = u_matrix * color;
+        gl_FragColor = color;
     }
     `
-    let width = 640;
-    let height = 360;
+    let width = 1280;
+    let height = 720;
     let canvas = document.createElement('canvas');
     let canvas2d = document.createElement('canvas');
 
@@ -109,6 +109,10 @@
 
     let image = new Image();
     image.src = './50i.bmp';
+    let video = document.createElement('video');
+    video.src = './test.mp4';
+    video.currentTime = 3.5;
+    window.video = video;
 
     function draw() {
         
@@ -117,31 +121,37 @@
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
 
-        context.drawImage(image, 0, 0, width, height);
+        // context.drawImage(image, 0, 0, width, height);
 
-        let imageData = context.getImageData(0, 0, width, height);
-        // console.log(imageData);
+        // let imageData = context.getImageData(0, 0, width, height);
+        // // console.log(imageData);
         
-        // let imageData = new ImageData(width, height);
-        for (let i = 0; i < width * height * 4; i += 4) {
-            // imageData.data[i] = 255;
-            // imageData.data[i + 1] = 0;
-            // imageData.data[i + 2] = 0;
-            // imageData.data[i + 3] = 255;
-            let vec = imageData.data.slice(i, i + 4);
-            let res = util.vecMultiMat(vec, uniforms.u_matrix);
-            imageData.data[i] = res[0];
-            imageData.data[i + 1] = res[1];
-            imageData.data[i + 2] = res[2];
-            imageData.data[i + 3] = res[3];
-        }
-        context.putImageData(imageData, 0, 0);
+        // // let imageData = new ImageData(width, height);
+        // for (let i = 0; i < width * height * 4; i += 4) {
+        //     // imageData.data[i] = 255;
+        //     // imageData.data[i + 1] = 0;
+        //     // imageData.data[i + 2] = 0;
+        //     // imageData.data[i + 3] = 255;
+        //     let vec = imageData.data.slice(i, i + 4);
+        //     let res = util.vecMultiMat(vec, uniforms.u_matrix);
+        //     imageData.data[i] = res[0];
+        //     imageData.data[i + 1] = res[1];
+        //     imageData.data[i + 2] = res[2];
+        //     imageData.data[i + 3] = res[3];
+        // }
+        // context.putImageData(imageData, 0, 0);
     }
 
-    image.onload = function () {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    video.oncanplaythrough = function () {
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
         draw();
+
     }
+
+    // image.onload = function () {
+    //     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    //     draw();
+    // }
 
 
     let input = document.createElement('input');

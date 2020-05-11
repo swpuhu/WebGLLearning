@@ -116,8 +116,25 @@ class TextRender {
                     let color = parentStyles['color'];
                     let backColor = parentStyles['background-color'];
                     let shadowColor = parentStyles['shadow'];
+                    let underline = parentStyles['text-decoration-line'];
+                    let params = this.fonts.find(item => (item.familyName === fontFamily));
+                    let underlineParams = null;
+                    if (underline) {
+                        let totalHeight;
+                        if (/mac/i.test(navigator.platform)) {
+                            totalHeight = params.HHAscent + params.HHDescent;
+                        } else if (params.useTypoMetrics) {
+                            totalHeight = params.typoAscent + params.typoDescent;
+                        } else {
+                            totalHeight = params.winAscent + params.winDescent;
+                        }
+                        underlineParams = {
+                            underlinePosition: params.underline_position / totalHeight * fontSize,
+                            underlineThickness: params.underline_thickness / totalHeight * fontSize
+                        }
+                    }
                     currentHeight = lineHeight;
-                    offsetX += this.drawText(res, fontFamily, fontSize, lineHeight, fontStyle, fontWeight, 'left', color, backColor, shadowColor, offsetX, baselineOffset, offsetY);
+                    offsetX += this.drawText(res, fontFamily, fontSize, lineHeight, fontStyle, fontWeight, 'left', color, backColor, shadowColor, underlineParams, offsetX, baselineOffset, offsetY);
                     console.log(res, parentStyles);
                 }
             }
@@ -245,10 +262,11 @@ class TextRender {
     }
 
 
-    drawText (text, fontFamily = 'SimHei Regular', fontSize = 16, lineHeight = 0, fontStyle = 'normal', fontWeight = 'normal', textAlign = 'left', color = '#000', backgroundColor, shadowColor, offsetX, baselineOffset, offsetY) {
+    drawText (text, fontFamily = 'SimHei Regular', fontSize = 16, lineHeight = 0, fontStyle = 'normal', fontWeight = 'normal', textAlign = 'left', color = '#000', backgroundColor, shadowColor, underlineParams, offsetX, baselineOffset, offsetY) {
         this.context.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
         this.context.textAlign = textAlign;
         this.context.textBaseline = 'alphabetic';
+        let width = this.context.measureText(text).width;
         if (shadowColor) {
             this.context.shadowColor = '#000';
             this.context.shadowOffsetX = 2;
@@ -256,18 +274,28 @@ class TextRender {
             this.context.shadowBlur = 2;
         }
         if (backgroundColor) {
-            // this.context.fillStyle = backgroundColor;
-            // this.context.rect(0, 0, canvas.width, canvas.height);
-            // this.context.fill();
+            this.context.fillStyle = backgroundColor;
+            this.context.moveTo(offsetX, offsetY);
+            this.context.fillRect(offsetX, offsetY, width, lineHeight);
         }
-        let width = this.context.measureText(text).width;
         this.context.fillStyle = color;
         let dY = offsetY + baselineOffset;
         this.context.strokeStyle = color;
-        this.context.moveTo(offsetX, dY);
-        this.context.lineTo(width, dY);
+        this.context.moveTo(offsetX, offsetY + lineHeight);
+        this.context.lineTo(offsetX + width, offsetY + lineHeight);
         this.context.stroke();
+
+        if (underlineParams) {
+            
+            // this.context.lineWidth = underlineParams.underlineThickness + 1;
+            // let underlinePosition = dY - underlineParams.underlinePosition;
+            // this.context.moveTo(offsetX, underlinePosition);
+            // this.context.lineTo(width + offsetX, underlinePosition);
+            // this.context.stroke();
+        }
+        this.context.strokeStyle = '#f00';
         this.context.fillText(text, offsetX, dY);
+        this.context.strokeText(text, offsetX, dY);
         return width;
     }
 }
