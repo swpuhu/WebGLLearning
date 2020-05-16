@@ -7,18 +7,19 @@
     <title>Document</title>
 </head>
 
-<body>
+<body style="background-image: url('./b.jpg');">
 
 </body>
 <script type="module">
     import util from '../util.js';
+    import Double from '../filter/2DFilter.js';
     const vertexShader = `
     attribute vec4 a_position;
     attribute vec2 a_texCoord;
     varying vec2 v_texCoord;
     uniform mat4 u_projection;
     void main () {
-    gl_Position = u_projection * a_position * vec4(1.0, -1.0, 1.0, 1.0);
+    gl_Position = u_projection * a_position;
     v_texCoord = a_texCoord;
     }
     `;
@@ -38,6 +39,7 @@
     void main () {
 
         vec4 color = texture2D(u_texture, v_texCoord);
+        color.a = color.a * 0.5;
         gl_FragColor = color;
     }
     `
@@ -54,8 +56,11 @@
     canvas2d.height = height;
 
     let context = canvas2d.getContext('2d');
-    let gl = canvas.getContext('webgl');
+    let gl = canvas.getContext('webgl2', {
+        premultipliedAlpha: false
+    });
     let pointsBuffer = gl.createBuffer();
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     gl.bindBuffer(gl.ARRAY_BUFFER, pointsBuffer);
     let points = new Float32Array([
         0.0, 0.0,
@@ -84,7 +89,8 @@
     let attribSetters = util.createAttributeSetters(gl, program);
     let uniformSetters = util.createUniformSetters(gl, program);
     let texture = util.createTexture(gl);
-
+    let imgTexture = util.createTexture(gl);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
     let attributes = {
         a_position: {
             buffer: pointsBuffer,
@@ -96,56 +102,70 @@
         }
     }
     let colorMatrix = new Float32Array([0.05541720241308212, 0.34079352021217346, -0.5869410634040833, 0,
-    -0.048134174197912216, 0.8745395541191101, 1.3783824443817139, 0, 0.9927169680595398, -0.21533308923244476,
-    0.20855861902236938, 0, 0, 0, 0, 1]);
+        -0.048134174197912216, 0.8745395541191101, 1.3783824443817139, 0, 0.9927169680595398, -0.21533308923244476,
+        0.20855861902236938, 0, 0, 0, 0, 1]);
 
     let res = util.vecMultiMat([255, 0, 0, 255], colorMatrix);
     console.log(res);
-    
+
     let uniforms = {
         u_projection: util.createProjection(width, height, 1),
         u_matrix: colorMatrix
     }
 
+    let doubleFilter = new Double(gl, uniforms.u_projection);
+    gl.useProgram(program);
     let image = new Image();
     image.src = './50i.bmp';
+    image.onload = function () {
+        createImageBitmap(this).then(img => {
+            image = img;
+        })
+        gl.bindTexture(gl.TEXTURE_2D, imgTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+    }
     let video = document.createElement('video');
     video.src = './test.mp4';
     video.currentTime = 3.5;
     window.video = video;
-
+    let id;
     function draw() {
-        
+        gl.useProgram(program);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
         util.setAttributes(attribSetters, attributes);
         util.setUniforms(uniformSetters, uniforms);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
+        gl.useProgram(doubleFilter.program);
+        gl.bindTexture(gl.TEXTURE_2D, imgTexture);
+        doubleFilter.setScale(0.5, 0.5, { x: 0, y: 0 });
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
 
-        // context.drawImage(image, 0, 0, width, height);
 
-        // let imageData = context.getImageData(0, 0, width, height);
-        // // console.log(imageData);
-        
-        // // let imageData = new ImageData(width, height);
-        // for (let i = 0; i < width * height * 4; i += 4) {
-        //     // imageData.data[i] = 255;
-        //     // imageData.data[i + 1] = 0;
-        //     // imageData.data[i + 2] = 0;
-        //     // imageData.data[i + 3] = 255;
-        //     let vec = imageData.data.slice(i, i + 4);
-        //     let res = util.vecMultiMat(vec, uniforms.u_matrix);
-        //     imageData.data[i] = res[0];
-        //     imageData.data[i + 1] = res[1];
-        //     imageData.data[i + 2] = res[2];
-        //     imageData.data[i + 3] = res[3];
-        // }
-        // context.putImageData(imageData, 0, 0);
+    function loop () {
+        draw();
+        id = requestAnimationFrame(loop);
     }
 
     video.oncanplaythrough = function () {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
         draw();
+    }
 
+    document.onkeydown = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (e.keyCode === 32) {
+            if (video.paused) {
+                video.play();
+                loop();
+            } else {
+                cancelAnimationFrame(id);
+                video.pause();
+            }
+
+        }
     }
 
     // image.onload = function () {
@@ -165,7 +185,7 @@
     }
 
 
-    
+
 </script>
 
 </html>
