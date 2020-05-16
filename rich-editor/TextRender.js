@@ -270,8 +270,8 @@ class TextRender {
         this.context.textAlign = textAlign;
         this.context.textBaseline = 'alphabetic';
         let width = this.context.measureText(text).width;
-        if (shadowColor) {
-            this.context.shadowColor = '#000';
+        if (1) {
+            this.context.shadowColor = '#ff0';
             this.context.shadowOffsetX = 2;
             this.context.shadowOffsetY = 2;
             this.context.shadowBlur = 2;
