@@ -10,6 +10,21 @@
 <body style="background-image: url('./b.jpg');">
 
 </body>
+<script>
+
+    function loadImage(url) {
+        return new Promise(resolve => {
+            let image = new Image();
+            image.onload = function () {
+                resolve(image);
+            }
+            image.src = url;
+        })
+    }
+    function loadImages(urls) {
+        return Promise.all(urls.map(loadImage));
+    }
+</script>
 <script type="module">
     import util from '../util.js';
     import Double from '../filter/2DFilter.js';
@@ -39,7 +54,7 @@
     void main () {
 
         vec4 color = texture2D(u_texture, v_texCoord);
-        color.a = color.a * 0.5;
+        color.a = color.a;
         gl_FragColor = color;
     }
     `
@@ -47,7 +62,7 @@
     let height = 720;
     let canvas = document.createElement('canvas');
     let canvas2d = document.createElement('canvas');
-
+    let imageUrls = ['./images/1.png', './images/2.png'];
     document.body.appendChild(canvas);
     document.body.appendChild(canvas2d);
     canvas.width = width;
@@ -144,13 +159,38 @@
     }
 
 
-    function loop () {
-        draw();
+    loadImages(imageUrls).then(images => {
+        setTimeout(() => {
+            gl.useProgram(program);
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
+            util.setAttributes(attribSetters, attributes);
+            util.setUniforms(uniformSetters, uniforms);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            gl.useProgram(doubleFilter.program);
+            doubleFilter.setScale(0.5, 0.5, { x: 0, y: 0 });
+            doubleFilter.setTranslate(500, 0);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[0]);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            gl.useProgram(doubleFilter.program);
+            doubleFilter.setScale(0.5, 0.5, { x: 0, y: 0 });
+            doubleFilter.setTranslate(0, 0);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, images[1]);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+
+        }, 1000);
+    });
+
+    function loop() {
+        // draw();
         id = requestAnimationFrame(loop);
     }
 
     video.oncanplaythrough = function () {
-        draw();
+        // draw();
     }
 
     document.onkeydown = (e) => {
@@ -181,7 +221,7 @@
     document.body.appendChild(input);
     input.onchange = function () {
         uniforms.u_matrix = util.createHueRotateMatrix(+input.value);
-        draw();
+        // draw();
     }
 
 

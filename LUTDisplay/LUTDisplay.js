@@ -87,7 +87,7 @@ function Process() {
     let str = '';
     let numbers = [];
     let obj = {};
-    function isAlpha (char) {
+    function isAlpha(char) {
         return /[a-zA-Z]/.test(char);
     }
 
@@ -107,7 +107,7 @@ function Process() {
         return /\s/.test(char);
     }
 
-    function isCarriage (char) {
+    function isCarriage(char) {
         return /\n/.test(char);
     }
 
@@ -120,9 +120,9 @@ function Process() {
         OTHER: 5
     };
     let state = states.END;
-    
-    function initState (char) {
-        if(isAlpha(char)) {
+
+    function initState(char) {
+        if (isAlpha(char)) {
             state = states.WORD
         } else if (isDigital(char)) {
             state = states.INT;
@@ -182,7 +182,7 @@ function Process() {
             value: process
         },
         result: {
-            get () {
+            get() {
                 return numbers;
             }
         }
