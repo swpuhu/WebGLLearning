@@ -1,25 +1,21 @@
 import util from '../util.js';
 
 const shader = {
-    vertexShader: `#version 300 es
-    in vec4 a_position;
-    in vec2 a_texCoord;
-    out vec2 v_texCoord;
+    vertexShader: `
+    attribute vec4 a_position;
+    attribute vec4 a_color;
+    varying vec4 v_color
 
     uniform mat4 u_projection;
     void main () {
         gl_Position = u_projection * a_position;
-        v_texCoord = a_texCoord;
+        v_color = a_color;
     }
     `,
-    fragmentShader:  `#version 300 es
+    fragmentShader:  `
     precision mediump float;
-    out vec4 out_color;
-    in vec2 v_texCoord;
-    uniform sampler2D u_texture;
-    uniform vec2 u_resolution;
-    uniform float u_width;
-    uniform float u_aspect;
+    varying vec2 v_color;
+
     void main () {
         vec2 sampleDivisor = vec2(u_width * u_aspect, u_width);
         vec2 pos = v_texCoord - 1.0 / u_resolution;
@@ -46,22 +42,8 @@ export default function (gl, projectionMat) {
     const a_position = gl.getAttribLocation(program, 'a_position');
     gl.enableVertexAttribArray(a_position);
     gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, f32size * 4, 0);
-    const a_texCoord = gl.getAttribLocation(program, 'a_texCoord');
-    gl.enableVertexAttribArray(a_texCoord);
-    gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, f32size * 4, f32size * 2);
 
-    const u_resolution = gl.getUniformLocation(program, 'u_resolution');
-    gl.uniform2f(u_resolution, gl.canvas.width, gl.canvas.height);
-
-    const u_texture = gl.getUniformLocation(program, 'u_texture');
-    gl.uniform1i(u_texture, 0);
-
-    const u_width = gl.getUniformLocation(program, 'u_width');
-    gl.uniform1f(u_width, 0.5);
-
-
-    const u_aspect = gl.getUniformLocation(program, 'u_aspect');
-    gl.uniform1f(u_aspect, 9 / 16);
+    const a_color = gl.getActiveAttrib
 
 
     function setFraction(width, aspect) {

@@ -352,6 +352,30 @@ function rotate (center, x, y, rotate) {
     ]
 }
 
+function rotate3D (rotate, x, y, z, center = {x: 0, y: 0, z: 0}, axis = 'z') {
+    let cos = Math.cos(rotate * Math.PI / 180);
+    let sin = Math.sin(rotate * Math.PI / 180);
+    if (axis === 'x') {
+        return [
+            x,
+            y * cos - z * sin + (1 - cos) * center.y + sin * center.z,
+            y * sin + z * cos + (1 - cos) * center.z - sin * center.y,
+        ]
+    } else if (axis === 'y') {
+        return [
+            x * cos - z * sin + (1 - cos) * center.x + sin * center.z,
+            y,
+            x * sin + z * cos + (1 - cos) * center.z - sin * center.x,
+        ]
+    } else {
+        return [
+            x * cos - y * sin + (1 - cos) * center.x + sin * center.y,
+            x * sin + y * cos + (1 - cos) * center.y - sin * center.x,
+            z
+        ]
+    }
+}
+
 function pnpoly (number, verX, verY, testX, testY) {
     let i, j, c = false;
     for (i = 0, j = number - 1; i < number; j = i++) {
@@ -989,6 +1013,61 @@ function scalePoint (x, y, scaleX, scaleY, center) {
     ]
 }
 
+function createFramebufferTexture (gl, number, width, height) {
+    let framebuffers = [];
+    let textures = [];
+    for (let i = 0; i < number; i++) {
+        let framebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+        let texture = createTexture(gl);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+        texture && textures.push(texture);
+        framebuffer && framebuffers.push(framebuffer);
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    return [framebuffers, textures];
+}
+
+function createRevolutionLinePoint (line, divide, center = {x: 0, y: 0, z: 0}, axis = 'x') {
+    let lines = [];
+    for (let i = 0; i <= 360; i += divide) {
+        let _line = [];
+        for (let j = 0; j < line.length; j += 3) {
+            let [_x, _y, _z] = rotate3D(i, line[j], line[j + 1], line[j + 2], center, axis);
+            _line.push([_x, _y, _z]);
+        }
+        lines.push(_line);
+    }
+    console.log(lines);
+    let points = [];
+    // lines.pop();
+    for (let i = 0; i < lines.length - 1; i++) {
+        let line1 = lines[i];
+        let line2 = lines[i + 1];
+        for (let j = 0; j < line1.length - 1; j++) {
+            let line1CurrentPoint = line1[j];
+            let line1NextPoint = line1[j + 1];
+            let line2CurrentPoint = line2[j];
+            let line2NextPoint = line2[j + 1];
+            points.push(...line1CurrentPoint, ...line1NextPoint);
+            points.push(...line1CurrentPoint, ...line2CurrentPoint, ...line2CurrentPoint, ...line1NextPoint);
+        }
+        let lastLine1Point = line1[line1.length - 1];
+        let lastLine2Point = line2[line2.length - 1];
+        points.push(...lastLine1Point, ...lastLine2Point);
+    }
+    let lastLine = lines[lines.length - 1];
+
+    for (let j = 0; j < lastLine.length - 1; j++) {
+        let currentPoint = lastLine[j];
+        let nextPoint = lastLine[j + 1];
+        points.push(...currentPoint, ...nextPoint); 
+    }
+    
+    console.log(points);
+    return new Float32Array(points);
+}
 export default {
     initWebGL,
     createProjection,
@@ -1005,6 +1084,7 @@ export default {
     createNoiseImage,
     createPerspective,
     rotate,
+    rotate3D,
     pnpoly,
     createEditor,
     inverse,
@@ -1021,5 +1101,7 @@ export default {
     setUniforms,
     setAttributes,
     generateTrianglesByLines,
-    scalePoint
+    scalePoint,
+    createFramebufferTexture,
+    createRevolutionLinePoint
 }
