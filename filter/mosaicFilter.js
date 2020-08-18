@@ -4,7 +4,7 @@ const shader = {
     vertexShader: `#version 300 es
     in vec4 a_position;
     in vec2 a_texCoord;
-    out vec2 v_texCoord;
+    varying vec2 v_texCoord;
 
     uniform mat4 u_projection;
     void main () {
@@ -15,7 +15,7 @@ const shader = {
     fragmentShader:  `#version 300 es
     precision mediump float;
     out vec4 out_color;
-    in vec2 v_texCoord;
+    varying vec2 v_texCoord;
     uniform sampler2D u_texture;
     uniform vec2 u_resolution;
     uniform float u_width;
@@ -57,7 +57,7 @@ export default function (gl, projectionMat) {
     gl.uniform1i(u_texture, 0);
 
     const u_width = gl.getUniformLocation(program, 'u_width');
-    gl.uniform1f(u_width, 0.5);
+    gl.uniform1f(u_width, 0.02);
 
 
     const u_aspect = gl.getUniformLocation(program, 'u_aspect');

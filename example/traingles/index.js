@@ -67,6 +67,7 @@ const programInfo = {
         u_translate: util.createTranslateMatrix(-200, 0, 500)
     }
 }
+
 gl.useProgram(program);
 
 util.setAttributes(programInfo.attribSetter, programInfo.attributes);
