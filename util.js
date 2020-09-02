@@ -4,7 +4,7 @@
  * @param {string} type 
  * @param {string} source 
  */
-function createShader (gl, type, source) {
+function createShader(gl, type, source) {
     let shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -22,7 +22,7 @@ function createShader (gl, type, source) {
  * @param {WebGLShader} vertexShader 
  * @param {WebGLShader} fragmentShader 
  */
-function createProgram (gl, vertexShader, fragmentShader) {
+function createProgram(gl, vertexShader, fragmentShader) {
     let program = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
@@ -41,14 +41,14 @@ function createProgram (gl, vertexShader, fragmentShader) {
  * @param {string} vertexSource 
  * @param {string} fragmentSource 
  */
-function initWebGL (gl, vertexSource, fragmentSource) {
+function initWebGL(gl, vertexSource, fragmentSource) {
     let vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
     let fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
     let program = createProgram(gl, vertexShader, fragmentShader);
     return program;
 }
 
-function createProjection (width, height, depth) {
+function createProjection(width, height, depth) {
     return [
         2 / width, 0, 0, 0,
         0, 2 / height, 0, 0,
@@ -62,7 +62,7 @@ function createProjection (width, height, depth) {
  * @param {Object} center
  * @param {Number} rotate
  */
-function createRotateMatrix (center, rotate, axis = 'z') {
+function createRotateMatrix(center, rotate, axis = 'z') {
     let cos = Math.cos(rotate * Math.PI / 180);
     let sin = Math.sin(rotate * Math.PI / 180);
     if (!center.z) {
@@ -102,7 +102,7 @@ function createRotateMatrix (center, rotate, axis = 'z') {
  * @param {Number} tx
  * @param {Number} ty
  */
-function createTranslateMatrix (tx = 0, ty = 0, tz = 0) {
+function createTranslateMatrix(tx = 0, ty = 0, tz = 0) {
     return new Float32Array([
         1.0, 0.0, 0.0, 0.0,
         0.0, 1.0, 0.0, 0.0,
@@ -117,7 +117,7 @@ function createTranslateMatrix (tx = 0, ty = 0, tz = 0) {
  * @param {Number} scaleY
  * @param {Number} scaleZ
  */
-function createScaleMatrix (scaleX, scaleY, scaleZ, center = {
+function createScaleMatrix(scaleX, scaleY, scaleZ, center = {
     x: 0,
     y: 0,
     z: 0
@@ -134,7 +134,7 @@ function createScaleMatrix (scaleX, scaleY, scaleZ, center = {
  * @desc 对比度矩阵
  * @param {Number} value
  */
-function createContrastMatrix (value) {
+function createContrastMatrix(value) {
     return new Float32Array([
         value, 0.0, 0.0, 0.0,
         0.0, value, 0.0, 0.0,
@@ -148,7 +148,7 @@ function createContrastMatrix (value) {
  * @desc 色相旋转矩阵
  * @param {Number} value
  */
-function createHueRotateMatrix (value) {
+function createHueRotateMatrix(value) {
     let sin = Math.sin(value * Math.PI / 180);
     let cos = Math.cos(value * Math.PI / 180);
     return new Float32Array([
@@ -163,7 +163,7 @@ function createHueRotateMatrix (value) {
  * @desc 饱和度矩阵
  * @param {Number} value
  */
-function createSaturateMatrix (value) {
+function createSaturateMatrix(value) {
     return new Float32Array([
         0.3086 * (1 - value) + value, 0.3086 * (1 - value), 0.3086 * (1 - value), 0.0,
         0.6094 * (1 - value), 0.6094 * (1 - value) + value, 0.6094 * (1 - value), 0.0,
@@ -181,7 +181,7 @@ function createSaturateMatrix (value) {
  * @param {Number} endArc 终止圆弧半径
  * @param {Boolean} clockwise 方向，默认顺时针
  */
-function createArcVertex (gl, x, y, radius, startArc, endArc, isInverse = false) {
+function createArcVertex(gl, x, y, radius, startArc, endArc, isInverse = false) {
     let precision = 1;
     let oneArc = Math.PI / 180
     let points = [x, y, x / gl.canvas.width, y / gl.canvas.height];
@@ -208,7 +208,7 @@ function createArcVertex (gl, x, y, radius, startArc, endArc, isInverse = false)
  *
  * @param {WebGLRenderingContext} gl
  */
-function createTexture (gl) {
+function createTexture(gl) {
     let texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -219,7 +219,7 @@ function createTexture (gl) {
     return texture;
 }
 
-function computeKernalWeight (kernal) {
+function computeKernalWeight(kernal) {
     let weight = kernal.reduce((prev, cur) => {
         return prev + cur;
     }, 0);
@@ -233,7 +233,7 @@ function computeKernalWeight (kernal) {
  * @param {Array} vertX
  * @param {Array} vertY
  */
-function checkPointIn (x, y, vertX, vertY) {
+function checkPointIn(x, y, vertX, vertY) {
     let minX = Math.min(...vertX);
     let minY = Math.min(...vertY);
     let maxX = Math.max(...vertX);
@@ -260,7 +260,7 @@ function checkPointIn (x, y, vertX, vertY) {
  * @param {Array} vertX
  * @param {Array} vertY
  */
-function checkPointIn2 (x, y, vertX, vertY) {
+function checkPointIn2(x, y, vertX, vertY) {
     let minX = Math.min(...vertX);
     let minY = Math.min(...vertY);
     let maxX = Math.max(...vertX);
@@ -285,7 +285,7 @@ function checkPointIn2 (x, y, vertX, vertY) {
  *
  * @param {String} hex
  */
-function hexToRGB (hex) {
+function hexToRGB(hex) {
     if (/#[a-f0-9]{6}/i.test(hex)) {
         let r = +('0x' + hex.substr(1, 2));
         let g = +('0x' + hex.substr(3, 2));
@@ -294,7 +294,7 @@ function hexToRGB (hex) {
     }
 }
 
-function generateImageByDiv (width, height, html) {
+function generateImageByDiv(width, height, html) {
     let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -332,7 +332,7 @@ function generateImageByDiv (width, height, html) {
  * @param {number} _bottom 
  * @param {number} _top 
  */
-function createClipPath (canvas, left = 0, right = 0, _bottom = 0, _top = 0, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
+function createClipPath(canvas, left = 0, right = 0, _bottom = 0, _top = 0, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
     return new Float32Array([
         0 + canvas.width * left, 0 + canvas.height * _top, left, _top,
         canvas.width - canvas.width * right, 0 + canvas.height * _top, 1 - right, _top,
@@ -343,7 +343,7 @@ function createClipPath (canvas, left = 0, right = 0, _bottom = 0, _top = 0, off
     ])
 }
 
-function rotate (center, x, y, rotate) {
+function rotate(center, x, y, rotate) {
     let cos = Math.cos(rotate * Math.PI / 180);
     let sin = Math.sin(rotate * Math.PI / 180);
     return [
@@ -352,7 +352,7 @@ function rotate (center, x, y, rotate) {
     ]
 }
 
-function rotate3D (rotate, x, y, z, center = {x: 0, y: 0, z: 0}, axis = 'z') {
+function rotate3D(rotate, x, y, z, center = { x: 0, y: 0, z: 0 }, axis = 'z') {
     let cos = Math.cos(rotate * Math.PI / 180);
     let sin = Math.sin(rotate * Math.PI / 180);
     if (axis === 'x') {
@@ -376,7 +376,7 @@ function rotate3D (rotate, x, y, z, center = {x: 0, y: 0, z: 0}, axis = 'z') {
     }
 }
 
-function pnpoly (number, verX, verY, testX, testY) {
+function pnpoly(number, verX, verY, testX, testY) {
     let i, j, c = false;
     for (i = 0, j = number - 1; i < number; j = i++) {
         if (((verY[i] > testY) !== (verY[j] > testY)) &&
@@ -387,11 +387,11 @@ function pnpoly (number, verX, verY, testX, testY) {
     return c;
 }
 
-function calcDistance (x1, y1, x2, y2) {
+function calcDistance(x1, y1, x2, y2) {
     return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 }
 
-function createTriangleClipPath (canvas, progress, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
+function createTriangleClipPath(canvas, progress, offsetX = 0, offsetY = 0, scaleX = 1, scaleY = 1, rotate = 0) {
     let centerX = canvas.width / 2 + offsetX * canvas.width;
     let centerY = canvas.height / 2 + offsetY * canvas.height;
     let distanceLD = calcDistance(centerX, centerY, 0, 0);
@@ -414,7 +414,7 @@ function createTriangleClipPath (canvas, progress, offsetX = 0, offsetY = 0, sca
 
 
 
-function createNoiseImage (width, height, type, factor) {
+function createNoiseImage(width, height, type, factor) {
     let data;
     switch (type) {
         case WebGLRenderingContext.RGBA:
@@ -453,7 +453,7 @@ function createNoiseImage (width, height, type, factor) {
 
 
 
-function createPerspective (near, far, l, r, t, b) {
+function createPerspective(near, far, l, r, t, b) {
     let rangeInv = 1.0 / (far - near);
 
     let n = near;
@@ -465,7 +465,7 @@ function createPerspective (near, far, l, r, t, b) {
     ];
 }
 
-function createEditor (name, type = 'range', min, max, value, step = 1) {
+function createEditor(name, type = 'range', min, max, value, step = 1) {
     let obj = {};
     let oninput = null;
     let wrapper = document.createElement('div');
@@ -490,25 +490,25 @@ function createEditor (name, type = 'range', min, max, value, step = 1) {
     wrapper.appendChild(display);
     Object.defineProperties(obj, {
         oninput: {
-            set (value) {
+            set(value) {
                 oninput = value;
             },
-            get () {
+            get() {
                 return oninput;
             }
         },
         ref: {
-            get () {
+            get() {
                 return wrapper;
             }
         },
         step: {
-            set (value) {
+            set(value) {
                 input.step = value;
             }
         },
         value: {
-            get () {
+            get() {
                 return input.value;
             }
         }
@@ -516,7 +516,7 @@ function createEditor (name, type = 'range', min, max, value, step = 1) {
     return obj;
 }
 
-function vecMultiMat (v, m) {
+function vecMultiMat(v, m) {
     var dst = [];
     for (var i = 0; i < 4; ++i) {
         dst[i] = 0.0;
@@ -528,7 +528,7 @@ function vecMultiMat (v, m) {
 }
 
 
-function multiply (a, b) {
+function multiply(a, b) {
     var a00 = a[0 * 4 + 0];
     var a01 = a[0 * 4 + 1];
     var a02 = a[0 * 4 + 2];
@@ -581,7 +581,7 @@ function multiply (a, b) {
     ];
 };
 
-function inverse (m) {
+function inverse(m) {
     var m00 = m[0 * 4 + 0];
     var m01 = m[0 * 4 + 1];
     var m02 = m[0 * 4 + 2];
@@ -667,19 +667,19 @@ function inverse (m) {
 };
 
 
-function cross (a, b) {
+function cross(a, b) {
     return [a[1] * b[2] - a[2] * b[1],
     a[2] * b[0] - a[0] * b[2],
     a[0] * b[1] - a[1] * b[0]
     ];
 };
 
-function subtractVectors (a, b) {
+function subtractVectors(a, b) {
     return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 }
 
 
-function normalize (v) {
+function normalize(v) {
     var length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     // 确定不会除以 0
     if (length > 0.00001) {
@@ -689,7 +689,7 @@ function normalize (v) {
     }
 }
 
-function lookAt (cameraPosition, target, up) {
+function lookAt(cameraPosition, target, up) {
     var zAxis = normalize(
         subtractVectors(target, cameraPosition));
     var xAxis = normalize(cross(up, zAxis));
@@ -706,7 +706,7 @@ function lookAt (cameraPosition, target, up) {
     ];
 }
 
-function createCirclePoints (centerX, centerY, radius, precision = 1) {
+function createCirclePoints(centerX, centerY, radius, precision = 1) {
     let step = Math.floor(360 / precision);
     let arr = [];
     arr.push(centerX, centerY);
@@ -721,7 +721,7 @@ function createCirclePoints (centerX, centerY, radius, precision = 1) {
 }
 
 
-function createRectPoints (x, y, width, height) {
+function createRectPoints(x, y, width, height) {
     let arr = new Float32Array([
         x, y,
         x + width, y,
@@ -736,7 +736,7 @@ function createRectPoints (x, y, width, height) {
 
 
 
-function generateTriangles (points1, points2) {
+function generateTriangles(points1, points2) {
     let ret = [];
     for (let i = 0; i < points1.length - 2; i += 2) {
         let point1X = points1[i];
@@ -760,7 +760,7 @@ function generateTriangles (points1, points2) {
 }
 
 
-function generateTrianglesByLines (lines, needNormals) {
+function generateTrianglesByLines(lines, needNormals) {
     if (lines.length < 2) throw new Error('lines nums must be more than 1');
     let normals = [];
     let _lines = [...lines];
@@ -802,7 +802,7 @@ function generateTrianglesByLines (lines, needNormals) {
         }
         baseLine = line;
     }
-    if(needNormals) {
+    if (needNormals) {
         return [new Float32Array(ret), new Float32Array(normals)];
     } else {
         return new Float32Array(ret);
@@ -810,7 +810,7 @@ function generateTrianglesByLines (lines, needNormals) {
 }
 
 
-function createUniformSetters (gl, program) {
+function createUniformSetters(gl, program) {
     let textureUnit = 0;
 
     /**
@@ -820,7 +820,7 @@ function createUniformSetters (gl, program) {
      * @param {WebGLUniformInfo} uniformInfo
      * @returns {function} the created setter.
      */
-    function createUniformSetter (program, uniformInfo) {
+    function createUniformSetter(program, uniformInfo) {
         const location = gl.getUniformLocation(program, uniformInfo.name);
         const type = uniformInfo.type;
         // Check if this uniform is an array
@@ -915,7 +915,7 @@ function createUniformSetters (gl, program) {
             for (let ii = 0; ii < info.size; ++ii) {
                 units.push(textureUnit++);
             }
-            return function () {};
+            return function () { };
             // return function (bindPoint, units) {
             //     return function (textures) {
             //         gl.uniform1iv(location, units);
@@ -927,7 +927,7 @@ function createUniformSetters (gl, program) {
             // }(getBindPointForSamplerType(gl, type), units);
         }
         if (type === gl.SAMPLER_2D || type === gl.SAMPLER_CUBE) {
-            return function(){}
+            return function () { }
             // return function (bindPoint, unit) {
             //     return function (texture) {
             //         gl.uniform1i(location, unit);
@@ -959,11 +959,11 @@ function createUniformSetters (gl, program) {
 }
 
 
-function createAttributeSetters (gl, program) {
+function createAttributeSetters(gl, program) {
     const attribSetters = {
     };
 
-    function createAttribSetter (index) {
+    function createAttribSetter(index) {
         return function (b) {
             gl.bindBuffer(gl.ARRAY_BUFFER, b.buffer);
             gl.enableVertexAttribArray(index);
@@ -986,7 +986,7 @@ function createAttributeSetters (gl, program) {
 }
 
 
-function setUniforms (setters, values) {
+function setUniforms(setters, values) {
     setters = setters.uniformSetters || setters;
     Object.keys(values).forEach(function (name) {
         const setter = setters[name];
@@ -996,7 +996,7 @@ function setUniforms (setters, values) {
     });
 }
 
-function setAttributes (setters, attribs) {
+function setAttributes(setters, attribs) {
     setters = setters.attribSetters || setters;
     Object.keys(attribs).forEach(function (name) {
         const setter = setters[name];
@@ -1006,14 +1006,14 @@ function setAttributes (setters, attribs) {
     });
 }
 
-function scalePoint (x, y, scaleX, scaleY, center) {
+function scalePoint(x, y, scaleX, scaleY, center) {
     return [
-        (x - center.x) * scaleX + center.x, 
+        (x - center.x) * scaleX + center.x,
         (y - center.y) * scaleY + center.y
     ]
 }
 
-function createFramebufferTexture (gl, number, width, height) {
+function createFramebufferTexture(gl, number, width, height) {
     let framebuffers = [];
     let textures = [];
     for (let i = 0; i < number; i++) {
@@ -1029,7 +1029,7 @@ function createFramebufferTexture (gl, number, width, height) {
     return [framebuffers, textures];
 }
 
-function createRevolutionLinePoint (line, divide, center = {x: 0, y: 0, z: 0}, axis = 'x') {
+function createRevolutionLinePoint(line, divide, center = { x: 0, y: 0, z: 0 }, axis = 'x') {
     let lines = [];
     for (let i = 0; i <= 360; i += divide) {
         let _line = [];
@@ -1062,12 +1062,144 @@ function createRevolutionLinePoint (line, divide, center = {x: 0, y: 0, z: 0}, a
     for (let j = 0; j < lastLine.length - 1; j++) {
         let currentPoint = lastLine[j];
         let nextPoint = lastLine[j + 1];
-        points.push(...currentPoint, ...nextPoint); 
+        points.push(...currentPoint, ...nextPoint);
     }
-    
+
     console.log(points);
     return new Float32Array(points);
 }
+
+/**
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {Float32Array} data 
+ * @param {Boolean} isStatic
+ * @returns {WebGLBuffer}
+ */
+function createBuffer(gl, data, isStatic = true) {
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, data, isStatic ? gl.STATIC_DRAW : gl.DYNAMIC_DRAW);
+    return buffer;
+}
+
+/**
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {Object} programInfo 
+ * @param {WebGLFramebuffer} frameBuffer 
+ * @param {WebGLTexture} texture 
+ */
+function drawByProgramInfo(gl, programInfo, frameBuffer = null, texture) {
+    gl.useProgram(programInfo.program);
+    setAttributes(programInfo.attributeSetter, programInfo.attributes);
+    setUniforms(programInfo.uniformSetter, programInfo.uniforms);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    // gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(programInfo.mode, programInfo.offset, programInfo.count);
+    texture && gl.bindTexture(gl.TEXTURE_2D, texture);
+}
+
+
+const createBlender = function (gl) {
+    const vertex = `
+        attribute vec4 a_position;
+        attribute vec2 a_texCoord;
+        varying vec2 v_texCoord;
+        void main () {
+            gl_Position = a_position;
+            v_texCoord = a_texCoord;
+        }
+    `;
+    const fragment = `
+        precision mediump float;
+        varying vec2 v_texCoord;
+        uniform sampler2D u_texture1;
+        uniform sampler2D u_texture2;
+        uniform int u_blend_type;
+        void main () {
+            vec4 color1 = texture2D(u_texture1, v_texCoord);
+            vec4 color2 = texture2D(u_texture2, v_texCoord);
+            if (u_blend_type == 0) {
+                gl_FragColor = vec4(color2.rgb * color2.a + color1.rgb * (1.0 - color2.a), color1.a + color2.a);
+            } else if (u_blend_type == 1) {
+                gl_FragColor = vec4(color1.rgb, color1.a * color2.r);
+            } else if (u_blend_type == 2) {
+                gl_FragColor = vec4(color2.rgb * color2.a + color1.rgb * (1.0 - color2.a), 1.0 - (1.0 - color1.a) * (1.0 - color2.a));
+            }
+        }
+    `
+    return function (resultTextures) {
+        if (!resultTextures.length) return;
+        let count = 0;
+        if (resultTextures.length === 1) {
+            gl.useProgram(filters.normalFilter.program);
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, resultTextures[count]);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[count]);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            count++;
+        } else if (resultTextures.length === 2) {
+            gl.useProgram(filters.blendFilter.program);
+            filters.blendFilter.setType(filters.blendFilter.BLENDTYPE.reallyNormal);
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, resultTextures[0]);
+
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, resultTextures[1]);
+            // filters.blendFilter.enableFlipY();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[count]);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, textures[count]);
+            count++;
+            // filters.blendFilter.disableFlipY();
+
+        } else if (resultTextures.length >= 3) {
+            gl.useProgram(filters.blendFilter.program);
+            filters.blendFilter.setType(filters.blendFilter.BLENDTYPE.reallyNormal);
+            let texturesCopy = resultTextures.slice();
+            let count = 0;
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, resultTextures[0]);
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(gl.TEXTURE_2D, resultTextures[1]);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[count]);
+            filters.blendFilter.setType(filters.blendFilter.BLENDTYPE.reallyNormal);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, textures[count]);
+            count++;
+            texturesCopy.shift();
+            texturesCopy.shift();
+
+            for (let i = 0; i < texturesCopy.length; i++) {
+                gl.activeTexture(gl.TEXTURE1);
+                gl.bindTexture(gl.TEXTURE_2D, texturesCopy[i]);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers[count % 2]);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                filters.blendFilter.setType(filters.blendFilter.BLENDTYPE.reallyNormal);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, textures[count % 2]);
+                count++;
+            }
+        }
+
+        gl.useProgram(filters.normalFilter.program);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        filters.normalFilter.enableFlipY();
+        let opacity = getOpacity(clip, trackTime);
+        filters.normalFilter.setAlpha(opacity);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        filters.normalFilter.setAlpha(1);
+    }
+};
+
 export default {
     initWebGL,
     createProjection,
@@ -1103,5 +1235,10 @@ export default {
     generateTrianglesByLines,
     scalePoint,
     createFramebufferTexture,
-    createRevolutionLinePoint
+    createRevolutionLinePoint,
+    createShader,
+    createProgram,
+    createBuffer,
+    drawByProgramInfo,
+    createBlender
 }

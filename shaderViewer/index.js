@@ -70,7 +70,8 @@ const programInfo = {
     uniforms: {
         CC_PMatrix: util.createProjection(width, height, 1),
         resolution: [width, height],
-        mouse: [200, 100]
+        mouse: [200, 100],
+        u_test: 0.5
     }
 }
 gl.useProgram(program);
