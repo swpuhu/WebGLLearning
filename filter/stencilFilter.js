@@ -1,7 +1,7 @@
-import util from '../util.js';
+import util from "../util.js";
 
 const shader = {
-    vertexShader: `
+  vertexShader: `
     attribute vec4 a_position;
     attribute vec2 a_texCoord;
     varying vec2 textureCoordinate;
@@ -13,7 +13,7 @@ const shader = {
         textureCoordinate2 = a_texCoord;
     }
     `,
-    fragmentShader: `
+  fragmentShader: `
     varying highp vec2 textureCoordinate;
     varying highp vec2 textureCoordinate2;
 
@@ -33,63 +33,77 @@ const shader = {
             gl_FragColor = vec4(textureColor.rgb, 1.0);
         }
     }
-    `
-}
+    `,
+};
 
 /**
- * 
- * @param {WebGL2RenderingContext} gl 
+ *
+ * @param {WebGL2RenderingContext} gl
  * @param {Float32Array} projectionMat
  */
 export default function (gl, projectionMat) {
-    
-    let program = util.initWebGL(gl, shader.vertexShader, shader.fragmentShader);
-    let f32size = Float32Array.BYTES_PER_ELEMENT;
-    gl.useProgram(program);
+  let program = util.initWebGL(gl, shader.vertexShader, shader.fragmentShader);
+  let f32size = Float32Array.BYTES_PER_ELEMENT;
+  gl.useProgram(program);
 
-    const u_projection = gl.getUniformLocation(program, 'u_projection');
-    gl.uniformMatrix4fv(u_projection, false, projectionMat);
-    const a_position = gl.getAttribLocation(program, 'a_position');
-    gl.enableVertexAttribArray(a_position);
-    gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, f32size * 4, 0);
-    const a_texCoord = gl.getAttribLocation(program, 'a_texCoord');
-    gl.enableVertexAttribArray(a_texCoord);
-    gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, f32size * 4, f32size * 2);
+  const u_projection = gl.getUniformLocation(program, "u_projection");
+  gl.uniformMatrix4fv(u_projection, false, projectionMat);
+  const a_position = gl.getAttribLocation(program, "a_position");
+  gl.enableVertexAttribArray(a_position);
+  gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, f32size * 4, 0);
+  const a_texCoord = gl.getAttribLocation(program, "a_texCoord");
+  gl.enableVertexAttribArray(a_texCoord);
+  gl.vertexAttribPointer(
+    a_texCoord,
+    2,
+    gl.FLOAT,
+    false,
+    f32size * 4,
+    f32size * 2
+  );
 
-    const keepAlpha = gl.getUniformLocation(program, 'keepAlpha');
-    gl.uniform1i(keepAlpha, 0);
+  const keepAlpha = gl.getUniformLocation(program, "keepAlpha");
+  gl.uniform1i(keepAlpha, 1);
 
-    const inputImageTexture2 = gl.getUniformLocation(program, 'inputImageTexture2');
-    gl.uniform1i(inputImageTexture2, 5);
+  const inputImageTexture2 = gl.getUniformLocation(
+    program,
+    "inputImageTexture2"
+  );
+  gl.uniform1i(inputImageTexture2, 5);
+  gl.activeTexture(gl.TEXTURE5);
+
+  let templateImg = new Image();
+  templateImg.src = "./template/shark.png";
+  const templateTexture = util.createTexture(gl);
+  templateImg.onload = function () {
     gl.activeTexture(gl.TEXTURE5);
+    gl.bindTexture(gl.TEXTURE_2D, templateTexture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      templateImg
+    );
+    gl.activeTexture(gl.TEXTURE0);
+  };
 
-    let templateImg = new Image();
-    templateImg.src = './template/shark.png';
-    const templateTexture = util.createTexture(gl);
-    templateImg.onload = function () {
-        gl.activeTexture(gl.TEXTURE5);
-        gl.bindTexture(gl.TEXTURE_2D, templateTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, templateImg);
-        gl.activeTexture(gl.TEXTURE0);
-    }
-    
-    function bindMap() {
-        gl.activeTexture(gl.TEXTURE5);
-        gl.bindTexture(gl.TEXTURE_2D, templateTexture);
-        // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, templateImg);
-        gl.activeTexture(gl.TEXTURE0);
-    }
+  function bindMap() {
+    gl.activeTexture(gl.TEXTURE5);
+    gl.bindTexture(gl.TEXTURE_2D, templateTexture);
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, templateImg);
+    gl.activeTexture(gl.TEXTURE0);
+  }
 
-    function setImage(img) {
-        templateImg = img;
-        bindMap();
-    }
+  function setImage(img) {
+    templateImg = img;
+    bindMap();
+  }
 
-    
-    
-    return {
-        program,
-        setImage,
-        bindMap
-    }
+  return {
+    program,
+    setImage,
+    bindMap,
+  };
 }

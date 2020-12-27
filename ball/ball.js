@@ -11,7 +11,9 @@ document.body.appendChild(canvas);
 const vertexShader = `
     attribute vec4 a_position;
     attribute vec4 a_color;
+    attribute vec4 a_normal;
     varying vec4 v_color;
+    varying vec4 v_normal;
     uniform mat4 u_world;
     uniform mat4 u_camera;
     uniform mat4 u_rotateX;
@@ -74,13 +76,15 @@ for (let i = 1; i < steps; i++) {
     let newLine = [];
     for (let i = 0; i < line.length; i += 4) {
         let points = line.slice(i, i + 4);
-        let newPoints = util.MatMultiVec(points, rotateMatrix);
+        let newPoints = util.vecMultiMat(points, rotateMatrix);
         newLine.push(...newPoints);
     }
     lines.push(newLine);
 }
-let points = util.generateTrianglesByLines(lines);
-points = new Float32Array(points)
+let [points, normals] = util.generateTrianglesByLines(lines, true);
+points = new Float32Array(points);
+normals = new Float32Array(normals);
+console.log(normals.length, points.length);
 
 let colors = [];
 let optionColors = [[0.0, 1.0, 1.0, 1.0], [0.0, 0.5, 0.5, 1.0]]
@@ -108,6 +112,10 @@ let colorBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
 
+let normalBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+
 let cameraPos = [0, 0, 0];
 let cameraMat = util.lookAt(cameraPos, [0, 0, far], [0, 1, 0]);
 cameraMat = util.inverse(cameraMat);
@@ -129,6 +137,10 @@ let attribs = {
     },
     a_color: {
         buffer: colorBuffer,
+        numComponents: 4
+    },
+    a_normal: {
+        buffer: normalBuffer,
         numComponents: 4
     }
 }

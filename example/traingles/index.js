@@ -31,10 +31,10 @@ for (let i = -90; i <= 90; i += 20) {
     let y = r * Math.sin(i * Math.PI / 180);
     halfCircle.push(x, y, z);
 }
-// console.log(halfCircle);
+
 
 const lines = util.createRevolutionLinePoint(halfCircle, 20, {x: 0, y: 0, z: z}, 'y');
-console.log(lines);
+// console.log(lines);
 const fullScreenPointBufferData = new Float32Array([
     0, 0, z,
     width, 0, z,
